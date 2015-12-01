@@ -40,10 +40,15 @@ protected:
 
 class Conductor
   : public webrtc::PeerConnectionObserver,
-    public webrtc::CreateSessionDescriptionObserver {
+    public webrtc::CreateSessionDescriptionObserver,
+    public webrtc::DataChannelObserver {
 public:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
     rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
+
+    virtual void OnStateChange();
+
+    virtual void OnMessage(const webrtc::DataBuffer &buffer);
 
     virtual void OnRenegotiationNeeded();
 
@@ -116,7 +121,7 @@ void Conductor::OnRemoveStream(webrtc::MediaStreamInterface *stream) {
 }
 
 void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
-
+    data_channel->RegisterObserver(this);
 }
 
 void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
@@ -154,9 +159,6 @@ Conductor::Conductor(std::string offer) {
         std::cerr << "Failed to create peerConnection";
         return;
     }
-
-    // Add the datachannel now so everything works ok
-    rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel = peerConnection->CreateDataChannel("test", NULL);
 
     Json::Reader reader;
     Json::Value jmessage;
@@ -205,4 +207,22 @@ void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
 
 void Conductor::OnRenegotiationNeeded() {
 
+}
+
+void Conductor::OnStateChange() {
+
+}
+
+void Conductor::OnMessage(const webrtc::DataBuffer &buffer) {
+    Json::Reader reader;
+    Json::Value jmessage;
+
+    std::string message(buffer.data.data<char>());
+
+    if(!reader.parse(message, jmessage)) {
+        std::cerr << "Could not parse data channel message";
+        return;
+    }
+
+    std::cout << "Recieved message: " << jmessage["message"];
 }
