@@ -15,9 +15,9 @@ IF(APPLE)
     SET(EXTRA_LIBS ${CARBON_LIBRARY} ${QUICKTIME_LIBRARY} ${APP_SERVICES_LIBRARY})
 ENDIF (APPLE)
 
-set(WEBRTC_SRC_DIR /Volumes/Data/Users/ghost/Library/webrtc/src)
-link_directories(webrtc/src/osx/Release/)
-file(GLOB libwebrtc webrtc/src/osx/Release/*.a)
+set(WEBRTC_SRC_DIR lib/webrtc/src)
+link_directories(lib/webrtc/src/out/Debug/)
+file(GLOB libwebrtc lib/webrtc/src/osx/Debug/*.a)
 include_directories(${WEBRTC_SRC_DIR})
 
 add_definitions("-x objective-c++") # as you already have
