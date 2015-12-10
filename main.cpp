@@ -224,7 +224,7 @@ void Conductor::OnMessage(const webrtc::DataBuffer &buffer) {
         return;
     }
 
-    std::cout << "Recieved message: " << jmessage["message"];
+    std::cout << "Recieved message: " << jmessage["message"] << std::endl;
 
     // Simple test to check if we can send through the DC as well.
     dataChannel->Send(buffer);

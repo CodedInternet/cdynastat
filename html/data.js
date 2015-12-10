@@ -28,7 +28,7 @@ dc.onmessage = function(event) {
 }
 
 dc.onopen = function () {
-    dc.send("Hello World!");
+    dc.send(JSON.stringify({message: "Hello World!"}));
 };
 
 dc.onclose = function () {
