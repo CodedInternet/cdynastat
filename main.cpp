@@ -7,6 +7,7 @@
 #include "webrtc/base/thread.h"
 #include "webrtc/base/scoped_ptr.h"
 #include "webrtc/base/json.h"
+#include "webrtc/base/ssladapter.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/app/webrtc/peerconnection.h"
 
@@ -45,6 +46,9 @@ class Conductor
 public:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
     rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
+    rtc::scoped_refptr<webrtc::DataChannelInterface> outboundDatachannel;
+
+    Conductor();
 
     virtual void OnStateChange();
 
@@ -55,8 +59,6 @@ public:
     virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc);
 
     virtual void OnFailure(const std::string &error);
-
-    Conductor(std::string offer);
 
     virtual int AddRef() const;
 
@@ -69,6 +71,8 @@ public:
     virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel);
 
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
+
+    void OnOffer(std::string offer);
 };
 
 int main(int argc, char* argv[]) {
@@ -78,23 +82,21 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    std::cout << "Please paste session description:";
-
-    std::string offer;
-    getline(std::cin, offer);
-
-    std::cout << "Recieved:" << offer << std::endl;
-
 
     rtc::AutoThread autoThread;
     rtc::Thread* thread = rtc::Thread::Current();
 
     webrtc::PeerConnectionInterface::IceServers servers;
     webrtc::PeerConnectionInterface::IceServer server;
-    server.uri = "stun:stun.l.google.com:19302";
+    server.uri = "stun.l.google.com:19302";
     servers.push_back(server);
 
-    Conductor conductor(offer);
+    Conductor* conductor = new Conductor();
+
+    std::cout << "Please paste session description:";
+    std::string offer;
+    getline(std::cin, offer);
+    conductor->OnOffer(offer);
 
     thread->Run();
 
@@ -113,7 +115,7 @@ int Conductor::Release() const {
 }
 
 void Conductor::OnAddStream(webrtc::MediaStreamInterface *stream) {
-
+    return;
 }
 
 void Conductor::OnRemoveStream(webrtc::MediaStreamInterface *stream) {
@@ -127,21 +129,18 @@ void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
 void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
     peerConnection->AddIceCandidate(candidate);
 
-    Json::StyledWriter writer;
-    Json::Value jmessage;
-
-    jmessage[kCandidateSdpMidName] = candidate->sdp_mid();
-    jmessage[kCandidateSdpMlineIndexName] = candidate->sdp_mline_index();
+    const webrtc::SessionDescriptionInterface *desc = peerConnection->local_description();
     std::string sdp;
-    if (!candidate->ToString(&sdp)) {
-        LOG(LS_ERROR) << "Failed to serialize candidate";
-        return;
-    }
-    jmessage[kCandidateSdpName] = sdp;
-    std::cout << writer.write(jmessage);
+    desc->ToString(&sdp);
+
+    Json::Value answer;
+    answer["type"] = "answer";
+    answer["sdp"] = sdp;
+
+    std::cout << answer;
 }
 
-Conductor::Conductor(std::string offer) {
+Conductor::Conductor() {
     peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
     webrtc::PeerConnectionInterface::IceServers servers;
@@ -159,12 +158,14 @@ Conductor::Conductor(std::string offer) {
         std::cerr << "Failed to create peerConnection";
         return;
     }
+}
 
+void Conductor::OnOffer(std::string offer) {
     Json::Reader reader;
     Json::Value jmessage;
     if (!reader.parse(offer, jmessage)) {
         std::cerr << "Received unknown message. " << offer;
-    return;
+        return;
     }
     std::string type, sdp;
     rtc::GetStringFromJsonObject(jmessage, "type", &type);
@@ -180,7 +181,7 @@ Conductor::Conductor(std::string offer) {
     webrtc::SessionDescriptionInterface* sessionDescription(webrtc::CreateSessionDescription(type, sdp, &error));
     if (!sessionDescription) {
         std::cerr << "Can't parse received session description message. "
-                     << "SdpParseError was: " << error.description;
+        << "SdpParseError was: " << error.description;
         return;
     }
     peerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
@@ -194,15 +195,6 @@ void Conductor::OnFailure(const std::string &error) {
 
 void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
     peerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), desc);
-
-    std::string sdp;
-    desc->ToString(&sdp);
-
-    Json::Value answer;
-    answer["type"] = "answer";
-    answer["sdp"] = sdp;
-
-    std::cout << "Answer: " << answer;
 }
 
 void Conductor::OnRenegotiationNeeded() {
@@ -224,5 +216,10 @@ void Conductor::OnMessage(const webrtc::DataBuffer &buffer) {
         return;
     }
 
-    std::cout << "Recieved message: " << jmessage["message"];
+    std::string smessage = jmessage["message"].asString();
+
+    std::cout << "Recieved message: " << smessage;
+
+//    webrtc::DataBuffer out(smessage);
+//    outboundDatachannel->Send(out);
 }
