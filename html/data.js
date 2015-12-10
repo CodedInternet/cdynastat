@@ -16,6 +16,7 @@ pc.ondatachannel = function(event) {
 
 pc.onicecandidate = function(event) {
     if(event.candidate == null) {
+        pc.setLocalDescription(pc.localDescription)
         console.log(JSON.stringify(pc.localDescription))
     }
 }
@@ -50,8 +51,10 @@ function getAnswer(offer) {
 }
 
 function gotSignal(signal) {
-    if (signal.sdp)
-        pc.setRemoteDescription(new RTCSessionDescription(signal));
+    if (signal.type == "answer")
+        pc.setRemoteDescription(new RTCSessionDescription(signal), function(event) {
+            console.log("Answer set");
+        });
     else
         pc.addIceCandidate(new RTCIceCandidate(signal));
 }
