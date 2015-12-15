@@ -23,6 +23,6 @@ include_directories(${WEBRTC_SRC_DIR})
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp conductor.cpp conductor.h)
 add_executable(cdynastat ${SOURCE_FILES})
 target_link_libraries(cdynastat ${libwebrtc})
