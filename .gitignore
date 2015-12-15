@@ -1,5 +1,5 @@
 # webrtc library does not need to be included directly
-lib/webrtc/
+lib/webrtc
 
 # Compiled Object files
 *.slo
