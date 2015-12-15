@@ -3,8 +3,11 @@
 #include "flagdefs.h"
 
 #include <iostream>
+#include <fstream>
+#include <json/reader.h>
 
 #include "conductor.h"
+#include "Dynastat.h"
 
 
 int main(int argc, char* argv[]) {
@@ -13,6 +16,17 @@ int main(int argc, char* argv[]) {
         rtc::FlagList::Print(NULL, false);
         return 0;
     }
+
+    Json::Value root;
+    Json::Reader reader;
+    std::ifstream config_doc("bbb_config.json", std::ifstream::binary);
+    bool configOk = reader.parse(config_doc, root, false);
+    if(!configOk) {
+        std::cerr << "Could not parse config file";
+        return 1;
+    }
+
+    dynastat::Dynastat device(root);
 
     std::cout << "Please paste session description:";
 

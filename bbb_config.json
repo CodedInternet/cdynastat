@@ -1,0 +1,14 @@
+{
+  "version": 1,
+
+  "motors": {
+    "left_foot_size": {
+      "address": 5,
+      "cal": -20,
+      "low": 0,
+      "high": 18000,
+      "speed": 127,
+      "damping": 127
+    }
+  }
+}
