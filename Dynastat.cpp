@@ -38,10 +38,6 @@ namespace dynastat {
         }
     }
 
-    Dynastat::~Dynastat() {
-        // @TODO: make sure motor and sensor objects get destroyed properly
-    }
-
     RMCS220xMotor::RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping) {
         this->rawLow = rawLow;
         this->rawHigh = rawHigh;

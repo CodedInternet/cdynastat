@@ -13,7 +13,6 @@ namespace dynastat {
 
     public:
         Dynastat(Json::Value &config);
-        ~Dynastat();
     };
 
     class RMCS220xMotor : public AbstractMotor {

@@ -47,4 +47,15 @@ namespace dynastat {
         }
     }
 
+    AbstractDynastat::~AbstractDynastat() {
+        for (std::map<std::string, AbstractMotor *>::iterator it = motors.begin(); it != motors.end(); ++it) {
+            delete it->second;
+            motors.erase(it->first);
+        }
+
+        for (std::map<std::string, AbstractSensor *>::iterator it = sensors.begin(); it != sensors.end(); ++it) {
+            delete it->second;
+            sensors.erase(it->first);
+        }
+    }
 }

@@ -46,6 +46,7 @@ namespace dynastat
 
     class AbstractDynastat {
     public:
+        ~AbstractDynastat();
         virtual int readSensor(std::string name);
         virtual int readMotor(std::string name);
         virtual void setMotor(std::string name, int pos);
