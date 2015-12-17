@@ -1,6 +1,7 @@
 //
 // Created by Tom Price on 17/12/2015.
 //
+#include <boost/random.hpp>
 
 #include "DynastatSimulator.h"
 
@@ -37,11 +38,12 @@ namespace dynastat {
     }
 
     void SimulatedSensor::updateValue() {
+        boost::random::mt19937 rng;
+        boost::random::uniform_int_distribution<> range(-change,change);
         while(running) {
-            std::srand((unsigned int) std::time(0));
 
             lock.lock();
-            value += std::rand() % (change *2 + 1) - change;
+            value += range(rng);
 
             if (value < 0) {
                 value = 0;
