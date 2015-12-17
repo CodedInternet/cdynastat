@@ -9,6 +9,14 @@
       "high": 18000,
       "speed": 127,
       "damping": 127
+    },
+    "left_rearfoot_frontal": {
+      "address": 10,
+      "cal": -450,
+      "low": 0,
+      "high": 1800,
+      "speed": 255,
+      "damping": 127
     }
   }
 }

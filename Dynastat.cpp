@@ -13,11 +13,11 @@ namespace dynastat {
             {
                 const Json::Value motorConfig = config["motors"];
                 for (Json::ValueIterator itr = motorConfig.begin() ; itr != motorConfig.end() ; itr++ ) {
-                    Json::Value conf = motorConfig[itr.memberName()];
+                    Json::Value conf = motorConfig[itr.name()];
                     if (conf == false or conf.get("address", 0).asInt()) {
                         continue;
                     }
-                    RMCS220xMotor motor(
+                    RMCS220xMotor* motor = new RMCS220xMotor(
                             conf["low"].asInt(),
                             conf["high"].asInt(),
                             conf["address"].asInt(),
@@ -25,8 +25,10 @@ namespace dynastat {
                             conf["speed"].asInt(),
                             conf["damping"].asInt()
                     );
-                    motors[conf.asString()] = &motor;
+                    motors[itr.key().asString()] = motor;
                 }
+
+                // @TODO: Rince and repeat for sensors
             }
 
                 break;
@@ -36,16 +38,8 @@ namespace dynastat {
         }
     }
 
-    int Dynastat::readSensor(std::string name) {
-        return 0;
-    }
-
-    int Dynastat::readMotor(std::string name) {
-        return 0;
-    }
-
-    void Dynastat::setMotor(std::string name, int pos) {
-
+    Dynastat::~Dynastat() {
+        // @TODO: make sure motor and sensor objects get destroyed properly
     }
 
     RMCS220xMotor::RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping) {
@@ -54,12 +48,12 @@ namespace dynastat {
         return;
     }
 
-    int RMCS220xMotor::get() {
-        return 0;
+    int RMCS220xMotor::getPosition() {
+        return 27;
     }
 
-    int RMCS220xMotor::set(int pos) {
-        return 0;
+    void RMCS220xMotor::setPosition(int pos) {
+        return;
     }
 
     int RMCS220xMotor::scalePos(int val, bool up) {

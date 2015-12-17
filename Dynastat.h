@@ -6,29 +6,24 @@
 #define CDYNASTAT_DYNASTAT_H
 
 #include <json/reader.h>
-#include "DynastatInterface.h"
+#include "AbstractDynastat.h"
 
 namespace dynastat {
-    class Dynastat : public DynastatInterface {
+    class Dynastat : public AbstractDynastat {
 
     public:
         Dynastat(Json::Value &config);
-
-        virtual int readSensor(std::string name);
-
-        virtual int readMotor(std::string name);
-
-        virtual void setMotor(std::string name, int pos);
+        ~Dynastat();
     };
 
-    class RMCS220xMotor : public MotorInterface {
+    class RMCS220xMotor : public AbstractMotor {
 
     public:
         RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping);
 
-        virtual int get();
+        virtual int getPosition();
 
-        virtual int set(int pos);
+        virtual void setPosition(int pos);
 
     private:
 

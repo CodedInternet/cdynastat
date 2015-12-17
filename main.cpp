@@ -20,6 +20,11 @@ int main(int argc, char* argv[]) {
     Json::Value root;
     Json::Reader reader;
     std::ifstream config_doc("bbb_config.json", std::ifstream::binary);
+    if(!config_doc.is_open()) {
+        std::cerr << "Error opening config file" << std::endl;
+        return 1;
+    }
+
     bool configOk = reader.parse(config_doc, root, false);
     if(!configOk) {
         std::cerr << "Could not parse config file";

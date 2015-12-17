@@ -20,9 +20,12 @@ link_directories(lib/webrtc/src/out/Release/)
 file(GLOB libwebrtc lib/webrtc/src/out/Release/*.a)
 include_directories(${WEBRTC_SRC_DIR})
 
+find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
+
+
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
-set(SOURCE_FILES main.cpp conductor.cpp conductor.h DynastatInterface.h Dynastat.cpp Dynastat.h)
+set(SOURCE_FILES main.cpp conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp)
 add_executable(cdynastat ${SOURCE_FILES})
-target_link_libraries(cdynastat ${libwebrtc})
+target_link_libraries(cdynastat ${libwebrtc} ${JSONCPP_LIBRARY})
