@@ -1,4 +1,5 @@
 #include <string>
+#include <cmath>
 
 #include "AbstractDynastat.h"
 
@@ -57,5 +58,22 @@ namespace dynastat {
             delete it->second;
             sensors.erase(it->first);
         }
+    }
+
+    int AbstractSensor::scaleValue(int val) {
+        int scaled;
+        val -= zeroValue;
+
+        if (val < 0) {
+            scaled = 0;
+        } else {
+            scaled = (int) std::floor(val * scale);
+
+            if (scale > (2 ^ bits - 1)) {
+                scaled = 2 ^ bits - 1;
+            }
+        }
+
+        return scaled;
     }
 }

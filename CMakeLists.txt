@@ -26,6 +26,6 @@ find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
-set(SOURCE_FILES main.cpp conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp)
+set(SOURCE_FILES main.cpp conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
 add_executable(cdynastat ${SOURCE_FILES})
-target_link_libraries(cdynastat ${libwebrtc} ${JSONCPP_LIBRARY})
+target_link_libraries(cdynastat ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)

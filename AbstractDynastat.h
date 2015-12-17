@@ -18,22 +18,24 @@ namespace dynastat
 
     class AbstractSensor {
     public:
+        virtual ~AbstractSensor() { };
         virtual int readValue() = 0;
-        virtual int scaleValue(int val) = 0;
+        virtual int scaleValue(int val);
 
     protected:
+        const int bits = 8;
         int zeroValue;
-        int halfValue;
-        int fullValue;
+        float scale;
     };
 
     class AbstractMotor {
     public:
+        virtual ~AbstractMotor() { };
         virtual int getPosition() = 0;
         virtual void setPosition(int pos) = 0;
 
     protected:
-        int bits = 8;
+        const int bits = 8;
         int rawLow;
         int rawHigh;
 
@@ -46,7 +48,7 @@ namespace dynastat
 
     class AbstractDynastat {
     public:
-        ~AbstractDynastat();
+        virtual ~AbstractDynastat();
         virtual int readSensor(std::string name);
         virtual int readMotor(std::string name);
         virtual void setMotor(std::string name, int pos);
