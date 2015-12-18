@@ -1,12 +1,14 @@
-language: c++
+language: cpp
+cache:
+  directories:
+  - lib/webrtc
 env:
-  - GYP_CROSSCOMPILE=1
-  - GYP_DEFINES="OS=linux target_arch=arm"
+  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm"
 install:
   - git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
-  - fetch webrtc
+  - if [ -d "src" ]; then fetch webrtc; else gclient sync; fi
 build:
   - ninja -C lib/webrtc/src/out/Release
   - cmake .
