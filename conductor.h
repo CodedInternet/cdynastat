@@ -78,6 +78,8 @@ public:
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
 
     virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
+
+    void count();
 };
 
 #endif //CDYNASTAT_CONDUCTOR_H

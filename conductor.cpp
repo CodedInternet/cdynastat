@@ -5,10 +5,23 @@
 #include "conductor.h"
 
 #include <string>
+#include <boost/thread.hpp>
 
 #include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
 
+
+void Conductor::count() {
+    int i = 0;
+    Json::Value json;
+    json["value"] = i;
+    while(true) {
+        json["value"] = i++;
+        webrtc::DataBuffer buffer(json.toStyledString());
+        dataChannel->Send(buffer);
+        boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+    }
+}
 
 int Conductor::AddRef() const {
     return 0;
@@ -29,6 +42,7 @@ void Conductor::OnRemoveStream(webrtc::MediaStreamInterface *stream) {
 void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
     data_channel->RegisterObserver(this);
     this->dataChannel = data_channel;
+    new boost::thread([=] {count();});
 }
 
 void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
