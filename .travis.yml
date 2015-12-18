@@ -8,7 +8,8 @@ install:
   - git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
-  - if [ -d "src" ]; then gclient sync; else fetch webrtc; fi
+  - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
+  - gclient sync -v
 build:
   - ninja -C lib/webrtc/src/out/Release
   - cmake .
