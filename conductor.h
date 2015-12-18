@@ -46,7 +46,8 @@ protected:
 class Conductor
         : public webrtc::PeerConnectionObserver,
           public webrtc::CreateSessionDescriptionObserver,
-          public webrtc::DataChannelObserver {
+          public webrtc::DataChannelObserver,
+          public webrtc::IceObserver {
 public:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
     rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
@@ -75,6 +76,8 @@ public:
     virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel);
 
     virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
+
+    virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
 };
 
 #endif //CDYNASTAT_CONDUCTOR_H

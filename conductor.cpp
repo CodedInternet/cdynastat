@@ -32,18 +32,7 @@ void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
 }
 
 void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
-//    peerConnection->AddIceCandidate(candidate);
 
-    const webrtc::SessionDescriptionInterface* desc = peerConnection->local_description();
-    std::string sdp;
-    desc->ToString(&sdp);
-
-    Json::StyledWriter writer;
-    Json::Value answer;
-    answer["type"] = "answer";
-    answer["sdp"] = sdp;
-
-    std::cout << writer.write(answer);
 }
 
 Conductor::Conductor(std::string offer) {
@@ -111,14 +100,14 @@ void Conductor::OnFailure(const std::string &error) {
 void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
     peerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), desc);
 
-    std::string sdp;
-    desc->ToString(&sdp);
-
-    Json::Value answer;
-    answer["type"] = "answer";
-    answer["sdp"] = sdp;
-
-    std::cout << "Answer: " << answer;
+//    std::string sdp;
+//    desc->ToString(&sdp);
+//
+//    Json::Value answer;
+//    answer["type"] = "answer";
+//    answer["sdp"] = sdp;
+//
+//    std::cout << "Answer: " << answer;
 }
 
 void Conductor::OnRenegotiationNeeded() {
@@ -144,4 +133,19 @@ void Conductor::OnMessage(const webrtc::DataBuffer &buffer) {
 
     // Simple test to check if we can send through the DC as well.
     dataChannel->Send(buffer);
+}
+
+void Conductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
+    if(new_state == peerConnection->kIceGatheringComplete) {
+        const webrtc::SessionDescriptionInterface* desc = peerConnection->local_description();
+        std::string sdp;
+        desc->ToString(&sdp);
+
+        Json::StyledWriter writer;
+        Json::Value answer;
+        answer["type"] = "answer";
+        answer["sdp"] = sdp;
+
+        std::cout << writer.write(answer);
+    }
 }
