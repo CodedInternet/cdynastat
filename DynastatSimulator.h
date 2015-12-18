@@ -12,7 +12,7 @@
 namespace dynastat {
     class DynastatSimulator : public AbstractDynastat {
     public:
-        DynastatSimulator(Json::Value config);
+        DynastatSimulator(Json::Value &config);
     };
 
     class SimulatedMotor : public AbstractMotor {

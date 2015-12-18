@@ -54,6 +54,12 @@ namespace dynastat
         virtual void setMotor(std::string name, int pos);
 
         const char* kConfSensors = "sensors";
+        const char* kConfRows = "rows";
+        const char* kConfCols = "cols";
+        const char* kConfZeroValue = "zero_value";
+        const char* kConfHalfValue = "half_value";
+        const char* kConfFullValue = "full_value";
+        const char* kConfBaseAddress = "base_address";
 
     protected:
         std::map<std::string, AbstractMotor*> motors;

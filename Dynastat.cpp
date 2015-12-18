@@ -8,7 +8,7 @@
 namespace dynastat {
 
     Dynastat::Dynastat(Json::Value &config) {
-        switch (config.get("version", "UTF-32").asInt()) {
+        switch (config.get("version", "0").asInt()) {
             case 1:
             {
                 const Json::Value motorConfig = config["motors"];

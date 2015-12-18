@@ -7,7 +7,7 @@
 #include <json/reader.h>
 
 #include "conductor.h"
-#include "Dynastat.h"
+//#include "Dynastat.h"
 #include "DynastatSimulator.h"
 
 
@@ -38,9 +38,6 @@ int main(int argc, char* argv[]) {
 
     std::string offer;
     getline(std::cin, offer);
-
-    std::cout << "Recieved:" << offer << std::endl;
-
 
     rtc::AutoThread autoThread;
     rtc::Thread* thread = rtc::Thread::Current();

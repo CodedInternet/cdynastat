@@ -7,28 +7,30 @@
 
 namespace dynastat {
 
-    DynastatSimulator::DynastatSimulator(Json::Value config) {
+    DynastatSimulator::DynastatSimulator(Json::Value &config) {
         const Json::Value sensorConfig = config[kConfSensors];
         for (Json::ValueIterator itr = sensorConfig.begin() ; itr != sensorConfig.end() ; itr++ ) {
-            Json::Value conf = sensorConfig[itr.name()];
+            const Json::Value conf = sensorConfig[itr.key().asString()];
+            if (conf == false or !conf.get(kConfBaseAddress, 0).asInt()) {
+                continue;
+            }
 
             std::map<int, AbstractSensor*>* pad = new std::map<int, AbstractSensor*>;
 
-            const int rows = conf["rows"].asInt();
-            const int cols = conf["cols"].asInt();
-            const int zeroValue = conf["zero_value"].asInt();
-            const int halfValue = conf["half_value"].asInt();
-            const int fullValue = conf["full_value"].asInt();
-            const int baseAddress = conf["base_address"].asInt();
+            const int rows = conf[kConfRows].asInt();
+            const int cols = conf[kConfCols].asInt();
+            const int zeroValue = conf[kConfZeroValue].asInt();
+            const int halfValue = conf[kConfHalfValue].asInt();
+            const int fullValue = conf[kConfFullValue].asInt();
+            const int baseAddress = conf[kConfBaseAddress].asInt();
 
             for(int row = 0; row < rows; row++) {
                 for(int col = 0; col < cols; col++) {
-                    const int id = row * col;
+                    const int id = row * cols + col;
                     SimulatedSensor* sensor = new SimulatedSensor(zeroValue, halfValue, fullValue);
-                    (*pad)[id] = sensor;
+                    pad->insert(pad->end(), std::pair<int, AbstractSensor*>(id, sensor));
                 }
             }
-
             sensors[itr.key().asString()] = pad;
 
         }
