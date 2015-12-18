@@ -7,6 +7,7 @@
 #include <string>
 
 #include "webrtc/base/json.h"
+#include "talk/app/webrtc/test/fakeconstraints.h"
 
 
 int Conductor::AddRef() const {
@@ -31,7 +32,7 @@ void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
 }
 
 void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
-    peerConnection->AddIceCandidate(candidate);
+//    peerConnection->AddIceCandidate(candidate);
 
     const webrtc::SessionDescriptionInterface* desc = peerConnection->local_description();
     std::string sdp;
@@ -53,8 +54,19 @@ Conductor::Conductor(std::string offer) {
     server.uri = "stun:stun.l.google.com:19302";
     servers.push_back(server);
 
+    bool dtls = true;
+    webrtc::FakeConstraints constraints;
+    if (dtls) {
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                                "true");
+        constraints.SetAllowDtlsSctpDataChannels();
+    } else {
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                                "false");
+    }
+
     peerConnection = peerConnectionFactory->CreatePeerConnection(servers,
-                                                                 NULL,
+                                                                 &constraints,
                                                                  NULL,
                                                                  NULL,
                                                                  this);

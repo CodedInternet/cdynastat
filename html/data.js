@@ -1,4 +1,4 @@
-var pc_config = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+var pc_config = {"iceServers": [{"url": "stun:23.21.150.121"}]};
 
 var pc = new webkitRTCPeerConnection(pc_config);
 
@@ -15,8 +15,14 @@ pc.ondatachannel = function(event) {
 };
 
 pc.onicecandidate = function(event) {
-    if(event.candidate == null) {
-        pc.setLocalDescription(pc.localDescription)
+    if(pc.iceGatheringState == "complete") {
+        //pc.setLocalDescription(pc.localDescription)
+        //console.log(JSON.stringify(pc.localDescription))
+    }
+}
+
+pc.icegatheringstatechange = function(event) {
+    if(pc.iceGatheringState == "complete") {
         console.log(JSON.stringify(pc.localDescription))
     }
 }
