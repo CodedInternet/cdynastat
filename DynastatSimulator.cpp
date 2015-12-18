@@ -53,11 +53,14 @@ void SimulatedMotor::setPosition(int pos) {
 SimulatedSensor::SimulatedSensor(int zeroValue, int halfValue, int fullValue) {
   this->zeroValue = zeroValue;
 
-  int max = 2 ^bits - 1;
+  int max = (2^bits) - 1;
   float m1 = (max / 2) / halfValue;
   float m2 = max / fullValue;
 
   scale = (m1 + m2) / 2;
+  boost::random::mt19937 rng;
+  boost::random::uniform_int_distribution<> range(0, max);
+  value = range(rng);
   worker = new boost::thread((boost::thread &&) [=] { updateValue(); });
 }
 
@@ -65,6 +68,7 @@ int SimulatedSensor::readValue() {
   lock.lock();
   int reading = value;
   lock.unlock();
+  boost::this_thread::sleep(boost::posix_time::milliseconds(2));
   return reading;
 }
 
@@ -83,7 +87,7 @@ void SimulatedSensor::updateValue() {
     }
     lock.unlock();
 
-    boost::this_thread::sleep(boost::posix_time::seconds(1));
+    boost::this_thread::sleep(boost::posix_time::milliseconds(5));
   }
 }
 

@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  dynastat::DynastatSimulator device(root);
+  dynastat::DynastatSimulator* device = new dynastat::DynastatSimulator(root);
 
   std::cout << "Please paste session description:";
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   server.uri = "stun:stun.l.google.com:19302";
   servers.push_back(server);
 
-  Conductor conductor(offer);
+  Conductor conductor(offer, device);
 
   thread->Run();
 

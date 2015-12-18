@@ -9,14 +9,14 @@
 
 #include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
+#include "AbstractDynastat.h"
 
 
 void Conductor::count() {
-  int i = 0;
   Json::Value json;
-  json["value"] = i;
+  json["sensors"];
   while (true) {
-    json["value"] = i++;
+    json["sensors"] = device->readSensors();
     webrtc::DataBuffer buffer(json.toStyledString());
     dataChannel->Send(buffer);
     boost::this_thread::sleep(boost::posix_time::milliseconds(1));
@@ -49,7 +49,8 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
 
 }
 
-Conductor::Conductor(std::string offer) {
+Conductor::Conductor(std::string offer, dynastat::AbstractDynastat *device) {
+  this->device = device;
   peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
   webrtc::PeerConnectionInterface::IceServers servers;

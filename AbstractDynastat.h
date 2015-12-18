@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <json/value.h>
 
 namespace dynastat {
 class ValueError: public std::exception {
@@ -49,6 +50,7 @@ class AbstractDynastat {
  public:
   virtual ~AbstractDynastat();
   virtual int readSensor(std::string name, int id);
+  virtual Json::Value readSensors();
   virtual int readMotor(std::string name);
   virtual void setMotor(std::string name, int pos);
 

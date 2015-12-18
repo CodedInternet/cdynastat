@@ -12,6 +12,7 @@
 #include "webrtc/base/scoped_ptr.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/app/webrtc/peerconnection.h"
+#include "AbstractDynastat.h"
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -52,6 +53,7 @@ class Conductor
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
   rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
+  dynastat::AbstractDynastat* device;
 
   virtual void OnStateChange();
 
@@ -63,7 +65,7 @@ class Conductor
 
   virtual void OnFailure(const std::string &error);
 
-  Conductor(std::string offer);
+  Conductor(std::string offer, dynastat::AbstractDynastat *device);
 
   virtual int AddRef() const;
 

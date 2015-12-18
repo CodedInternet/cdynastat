@@ -1,5 +1,6 @@
 #include <string>
 #include <cmath>
+#include <json/value.h>
 
 #include "AbstractDynastat.h"
 
@@ -85,5 +86,16 @@ int AbstractSensor::scaleValue(int val) {
   }
 
   return scaled;
+}
+Json::Value AbstractDynastat::readSensors() {
+  Json::Value result;
+  for (std::map<std::string, std::map<int, AbstractSensor *> *>::iterator it1 = sensors.begin(); it1 != sensors.end();
+       ++it1) {
+    std::map<int, AbstractSensor *> *pad = it1->second;
+    for (std::map<int, AbstractSensor *>::iterator it2 = pad->begin(); it2 != pad->end(); it2++) {
+      result[it1->first + std::to_string(it2->first)] = it2->second->readValue();
+    }
+  }
+  return result;
 }
 }
