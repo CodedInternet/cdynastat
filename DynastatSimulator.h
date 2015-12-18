@@ -10,38 +10,37 @@
 #include "AbstractDynastat.h"
 
 namespace dynastat {
-    class DynastatSimulator : public AbstractDynastat {
-    public:
-        DynastatSimulator(Json::Value &config);
-    };
+class DynastatSimulator: public AbstractDynastat {
+ public:
+  DynastatSimulator(Json::Value &config);
+};
 
-    class SimulatedMotor : public AbstractMotor {
+class SimulatedMotor: public AbstractMotor {
 
-    public:
-        virtual int getPosition();
+ public:
+  virtual int getPosition();
 
-        virtual void setPosition(int pos);
-    };
+  virtual void setPosition(int pos);
+};
 
-    class SimulatedSensor : public AbstractSensor {
-    public:
-        virtual int readValue();
+class SimulatedSensor: public AbstractSensor {
+ public:
+  virtual int readValue();
 
-        void updateValue();
+  void updateValue();
 
-        SimulatedSensor(int zeroValue, int halfValue, int fullValue);
+  SimulatedSensor(int zeroValue, int halfValue, int fullValue);
 
-        ~SimulatedSensor();
+  ~SimulatedSensor();
 
-    private:
-        boost::thread* worker;
-        std::mutex lock;
-        int value;
-        bool running = true;
-        const int change = 5;
-    };
+ private:
+  boost::thread *worker;
+  std::mutex lock;
+  int value;
+  bool running = true;
+  const int change = 5;
+};
 }
-
 
 
 #endif //CDYNASTAT_DYNASTATSIMULATOR_H

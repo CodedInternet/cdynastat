@@ -9,27 +9,27 @@
 #include "AbstractDynastat.h"
 
 namespace dynastat {
-    class Dynastat : public AbstractDynastat {
+class Dynastat: public AbstractDynastat {
 
-    public:
-        Dynastat(Json::Value &config);
-    };
+ public:
+  Dynastat(Json::Value &config);
+};
 
-    class RMCS220xMotor : public AbstractMotor {
+class RMCS220xMotor: public AbstractMotor {
 
-    public:
-        RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping);
+ public:
+  RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping);
 
-        virtual int getPosition();
+  virtual int getPosition();
 
-        virtual void setPosition(int pos);
+  virtual void setPosition(int pos);
 
-    private:
+ private:
 
-        virtual int scalePos(int val, bool up);
+  virtual int scalePos(int val, bool up);
 
-        virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
-    };
+  virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
+};
 }
 
 

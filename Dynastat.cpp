@@ -7,56 +7,55 @@
 
 namespace dynastat {
 
-    Dynastat::Dynastat(Json::Value &config) {
-        switch (config.get("version", "0").asInt()) {
-            case 1:
-            {
-                const Json::Value motorConfig = config["motors"];
-                for (Json::ValueIterator itr = motorConfig.begin() ; itr != motorConfig.end() ; itr++ ) {
-                    Json::Value conf = motorConfig[itr.name()];
-                    if (conf == false or conf.get("address", 0).asInt()) {
-                        continue;
-                    }
-                    RMCS220xMotor* motor = new RMCS220xMotor(
-                            conf["low"].asInt(),
-                            conf["high"].asInt(),
-                            conf["address"].asInt(),
-                            conf.get("bus", -1).asInt(),
-                            conf["speed"].asInt(),
-                            conf["damping"].asInt()
-                    );
-                    motors[itr.key().asString()] = motor;
-                }
-
-                // @TODO: Rince and repeat for sensors
-            }
-
-                break;
-
-            default:
-                break;
+Dynastat::Dynastat(Json::Value &config) {
+  switch (config.get("version", "0").asInt()) {
+    case 1: {
+      const Json::Value motorConfig = config["motors"];
+      for (Json::ValueIterator itr = motorConfig.begin(); itr != motorConfig.end(); itr++) {
+        Json::Value conf = motorConfig[itr.name()];
+        if (conf == false or conf.get("address", 0).asInt()) {
+          continue;
         }
+        RMCS220xMotor *motor = new RMCS220xMotor(
+            conf["low"].asInt(),
+            conf["high"].asInt(),
+            conf["address"].asInt(),
+            conf.get("bus", -1).asInt(),
+            conf["speed"].asInt(),
+            conf["damping"].asInt()
+        );
+        motors[itr.key().asString()] = motor;
+      }
+
+      // @TODO: Rince and repeat for sensors
     }
 
-    RMCS220xMotor::RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping) {
-        this->rawLow = rawLow;
-        this->rawHigh = rawHigh;
-        return;
-    }
+      break;
 
-    int RMCS220xMotor::getPosition() {
-        return 27;
-    }
+    default:
+      break;
+  }
+}
 
-    void RMCS220xMotor::setPosition(int pos) {
-        return;
-    }
+RMCS220xMotor::RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping) {
+  this->rawLow = rawLow;
+  this->rawHigh = rawHigh;
+  return;
+}
 
-    int RMCS220xMotor::scalePos(int val, bool up) {
-        return 0;
-    }
+int RMCS220xMotor::getPosition() {
+  return 27;
+}
 
-    int RMCS220xMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
-        return 0;
-    }
+void RMCS220xMotor::setPosition(int pos) {
+  return;
+}
+
+int RMCS220xMotor::scalePos(int val, bool up) {
+  return 0;
+}
+
+int RMCS220xMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
+  return 0;
+}
 }

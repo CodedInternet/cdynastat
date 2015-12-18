@@ -22,12 +22,12 @@ const uint16_t kDefaultServerPort = 8080;  // From defaults.[h|cc]
 
 DEFINE_bool(help, false, "Prints this message");
 DEFINE_bool(autoconnect, false, "Connect to the server without user "
-                                "intervention.");
+    "intervention.");
 DEFINE_string(server, "localhost", "The server to connect to.");
 DEFINE_int(port, kDefaultServerPort,
            "The port on which the server is listening.");
 DEFINE_bool(autocall, false, "Call the first available other client on "
-  "the server without user intervention.  Note: this flag should only be set "
-  "to true on one of the two clients.");
+    "the server without user intervention.  Note: this flag should only be set "
+    "to true on one of the two clients.");
 
 #endif  // CDYNASTAT_FLAGDEFS_H_

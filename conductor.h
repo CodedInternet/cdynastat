@@ -23,63 +23,63 @@ const char kSessionDescriptionTypeName[] = "type";
 const char kSessionDescriptionSdpName[] = "sdp";
 
 class DummySetSessionDescriptionObserver
-        : public webrtc::SetSessionDescriptionObserver {
-public:
-    static DummySetSessionDescriptionObserver* Create() {
-        return
-                new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
-    }
-    virtual void OnSuccess() {
-        std::cout << "Set Description Success" << std::endl;
-        LOG(INFO) << __FUNCTION__;
-    }
-    virtual void OnFailure(const std::string& error) {
-        std::cerr << "Set description error: " << error << std::endl;
-        LOG(INFO) << __FUNCTION__ << " " << error;
-    }
+    : public webrtc::SetSessionDescriptionObserver {
+ public:
+  static DummySetSessionDescriptionObserver *Create() {
+    return
+        new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
+  }
+  virtual void OnSuccess() {
+    std::cout << "Set Description Success" << std::endl;
+    LOG(INFO) << __FUNCTION__;
+  }
+  virtual void OnFailure(const std::string &error) {
+    std::cerr << "Set description error: " << error << std::endl;
+    LOG(INFO) << __FUNCTION__ << " " << error;
+  }
 
-protected:
-    DummySetSessionDescriptionObserver() {}
-    ~DummySetSessionDescriptionObserver() {}
+ protected:
+  DummySetSessionDescriptionObserver() { }
+  ~DummySetSessionDescriptionObserver() { }
 };
 
 class Conductor
-        : public webrtc::PeerConnectionObserver,
-          public webrtc::CreateSessionDescriptionObserver,
-          public webrtc::DataChannelObserver,
-          public webrtc::IceObserver {
-public:
-    rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
-    rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-    rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
+    : public webrtc::PeerConnectionObserver,
+      public webrtc::CreateSessionDescriptionObserver,
+      public webrtc::DataChannelObserver,
+      public webrtc::IceObserver {
+ public:
+  rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
+  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
+  rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
 
-    virtual void OnStateChange();
+  virtual void OnStateChange();
 
-    virtual void OnMessage(const webrtc::DataBuffer &buffer);
+  virtual void OnMessage(const webrtc::DataBuffer &buffer);
 
-    virtual void OnRenegotiationNeeded();
+  virtual void OnRenegotiationNeeded();
 
-    virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc);
+  virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc);
 
-    virtual void OnFailure(const std::string &error);
+  virtual void OnFailure(const std::string &error);
 
-    Conductor(std::string offer);
+  Conductor(std::string offer);
 
-    virtual int AddRef() const;
+  virtual int AddRef() const;
 
-    virtual int Release() const;
+  virtual int Release() const;
 
-    virtual void OnAddStream(webrtc::MediaStreamInterface *stream);
+  virtual void OnAddStream(webrtc::MediaStreamInterface *stream);
 
-    virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream);
+  virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream);
 
-    virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel);
+  virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel);
 
-    virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
+  virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
 
-    virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
+  virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
 
-    void count();
+  void count();
 };
 
 #endif //CDYNASTAT_CONDUCTOR_H
