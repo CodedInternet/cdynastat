@@ -9,7 +9,7 @@ install:
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
-  - gclient sync -v
+  - gclient sync
 build:
   - ninja -C lib/webrtc/src/out/Release
   - cmake .
