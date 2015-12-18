@@ -49,13 +49,15 @@ namespace dynastat
     class AbstractDynastat {
     public:
         virtual ~AbstractDynastat();
-        virtual int readSensor(std::string name);
+        virtual int readSensor(std::string name, int id);
         virtual int readMotor(std::string name);
         virtual void setMotor(std::string name, int pos);
 
+        const char* kConfSensors = "sensors";
+
     protected:
         std::map<std::string, AbstractMotor*> motors;
-        std::map<std::string, AbstractSensor*> sensors;
+        std::map<std::string, std::map<int, AbstractSensor*>*> sensors;
     };
 }
 

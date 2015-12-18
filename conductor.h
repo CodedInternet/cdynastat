@@ -30,9 +30,11 @@ public:
                 new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
     }
     virtual void OnSuccess() {
+        std::cout << "Set Description Success" << std::endl;
         LOG(INFO) << __FUNCTION__;
     }
     virtual void OnFailure(const std::string& error) {
+        std::cerr << "Set description error: " << error << std::endl;
         LOG(INFO) << __FUNCTION__ << " " << error;
     }
 

@@ -8,6 +8,7 @@
 
 #include "conductor.h"
 #include "Dynastat.h"
+#include "DynastatSimulator.h"
 
 
 int main(int argc, char* argv[]) {
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    dynastat::Dynastat device(root);
+    dynastat::DynastatSimulator device(root);
 
     std::cout << "Please paste session description:";
 

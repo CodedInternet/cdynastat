@@ -11,6 +11,7 @@
 
 namespace dynastat {
     class DynastatSimulator : public AbstractDynastat {
+    public:
         DynastatSimulator(Json::Value config);
     };
 

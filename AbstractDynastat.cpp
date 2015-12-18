@@ -10,8 +10,9 @@ namespace dynastat {
         return motor->getPosition();
     }
 
-    int AbstractDynastat::readSensor(std::string name) {
-        AbstractSensor* sensor = sensors.at(name);
+    int AbstractDynastat::readSensor(std::string name, int id) {
+        std::map<int, AbstractSensor*>* pad = sensors.at(name);
+        AbstractSensor* sensor = pad->at(id);
         return sensor->readValue();
     }
 
@@ -54,9 +55,14 @@ namespace dynastat {
             motors.erase(it->first);
         }
 
-        for (std::map<std::string, AbstractSensor *>::iterator it = sensors.begin(); it != sensors.end(); ++it) {
-            delete it->second;
-            sensors.erase(it->first);
+        for (std::map<std::string, std::map<int, AbstractSensor*>*>::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
+            std::map<int, AbstractSensor*>* pad = it1->second;
+            for(std::map<int, AbstractSensor*>::iterator it2 = pad->begin(); it2 != pad->end(); it2++) {
+                delete it2->second;
+                pad->erase(it2->first);
+            }
+            delete it1->second;
+            sensors.erase(it1->first);
         }
     }
 
