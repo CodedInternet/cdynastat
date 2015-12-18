@@ -1,4 +1,8 @@
 language: cpp
+addons:
+  apt:
+    packages:
+    - libxtst-dev
 cache:
   directories:
   - lib/webrtc
