@@ -4,7 +4,19 @@ dist: precise
 addons:
   apt:
     packages:
+    - libasound2-dev                                                                
+    - libexpat1-dev
+    - libgconf2-dev
+    - libgnome-keyring-dev
+    - libgtk2.0-dev
+    - libjpeg62-dev
+    - libnss3-dev
+    - libpci-dev
+    - libpulse-dev
+    - libudev-dev
+    - libxss-dev
     - libxtst-dev
+    - libxv-dev
 cache:
   directories:
   - lib/webrtc
