@@ -75,8 +75,8 @@ void AbstractSensor::setScale(int zeroValue, int halfValue, int fullValue) {
   this->zeroValue = zeroValue;
 
   double max = (pow(2, bits) - 1);
-  double m1 = (max / 2) / halfValue;
-  double m2 = max / fullValue;
+  double m1 = halfValue / (max / 2) ;
+  double m2 = fullValue / max;
 
   scale = (m1 + m2) / 2;
 }
@@ -88,7 +88,7 @@ int AbstractSensor::scaleValue(int val) {
   if (val < 0) {
     scaled = 0;
   } else {
-    scaled = (int) std::floor(val * scale);
+    scaled = (int) std::round(val * scale);
 
     if (scaled > pow(2, bits) - 1) {
       scaled = (int) (pow(2, bits) - 1);
