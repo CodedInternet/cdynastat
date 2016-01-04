@@ -23,9 +23,11 @@ class AbstractSensor {
   virtual int scaleValue(int val);
 
  protected:
+  virtual void setScale(int zeroValue, int halfValue, int fullValue);
+
   const int bits = 8;
   int zeroValue;
-  float scale;
+  double scale;
 };
 
 class AbstractMotor {

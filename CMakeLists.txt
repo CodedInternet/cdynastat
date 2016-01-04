@@ -26,6 +26,22 @@ find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
-set(SOURCE_FILES main.cpp conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
-add_executable(cdynastat ${SOURCE_FILES})
-target_link_libraries(cdynastat ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+# Define shared libraries
+set(SHARED_LIBS ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+
+include(DownloadProject.cmake)
+download_project(PROJ                googletest
+        GIT_REPOSITORY      https://github.com/google/googletest.git
+        GIT_TAG             master
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+set(SOURCE_FILES conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
+add_executable(cdynastat main.cpp ${SOURCE_FILES})
+target_link_libraries(cdynastat ${SHARED_LIBS})
+
+# Test definitions
+add_executable(allTests ${SOURCE_FILES} AbstractDynastat_unittest.cpp)
+target_link_libraries(allTests gtest_main gtest ${SHARED_LIBS})
