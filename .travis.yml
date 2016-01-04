@@ -28,6 +28,8 @@ install:
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
   - gclient sync
+before_script:
+  - cd $TRAVIS_BUILD_DIR
 script:
   - ninja -C lib/webrtc/src/out/Release
   - cmake . && make
