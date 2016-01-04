@@ -28,6 +28,6 @@ install:
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
   - gclient sync
-build:
+script:
   - ninja -C lib/webrtc/src/out/Release
-  - cmake .
+  - cmake . && make
