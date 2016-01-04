@@ -22,6 +22,9 @@ cache:
   - lib/webrtc
 env:
   - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm"
+before_install:
+  - unset CC
+  - unset CXX
 install:
   - git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
   - export PATH=`pwd`/depot_tools:"$PATH"
