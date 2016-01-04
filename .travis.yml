@@ -10,6 +10,7 @@ addons:
     - libgnome-keyring-dev
     - libgtk2.0-dev
     - libjpeg62-dev
+    - libjsoncpp-dev
     - libnss3-dev
     - libpci-dev
     - libpulse-dev
@@ -21,7 +22,7 @@ cache:
   directories:
   - lib/webrtc
 env:
-  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm"
+  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm clang=0"
 before_install:
   - unset CC
   - unset CXX
