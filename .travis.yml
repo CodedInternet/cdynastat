@@ -18,6 +18,9 @@ addons:
     - libxss-dev
     - libxtst-dev
     - libxv-dev
+#    Manually install arm deps
+    - libc6-dev-armhf-cross
+    - g++-arm-linux-gnueabihf
 cache:
   directories:
   - lib/webrtc
