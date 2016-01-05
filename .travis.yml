@@ -36,7 +36,7 @@ install:
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
   - gclient sync
   - export GYP_DEFINES="$GYP_DEFINES clang=0"
-  - ./src/build/install-build-deps.sh --arm --no-prompt
+  - sudo ./src/build/install-build-deps.sh --arm --no-prompt
   - gclient runhooks
 before_script:
   - cd $TRAVIS_BUILD_DIR
