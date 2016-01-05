@@ -22,7 +22,7 @@ cache:
   directories:
   - lib/webrtc
 env:
-  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm"
+  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm clang=0"
 before_install:
   - unset CC
   - unset CXX
@@ -32,9 +32,6 @@ install:
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
   - gclient sync
-  - export GYP_DEFINES="$GYP_DEFINES clang=0"
-  - ./src/build/install-build-deps.sh --arm
-  - gclient runhooks
 before_script:
   - cd $TRAVIS_BUILD_DIR
 script:
