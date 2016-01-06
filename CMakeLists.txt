@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 2.8.2)
 project(cdynastat)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -26,6 +26,39 @@ find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
-set(SOURCE_FILES main.cpp conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
-add_executable(cdynastat ${SOURCE_FILES})
-target_link_libraries(cdynastat ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+# Define shared libraries
+set(SHARED_LIBS ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+
+# gtest DownloadProject
+# https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
+if (CMAKE_VERSION VERSION_LESS 3.2)
+    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+else()
+    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+endif()
+
+include(DownloadProject.cmake)
+download_project(PROJ                googletest
+        GIT_REPOSITORY      https://github.com/google/googletest.git
+        GIT_TAG             master
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+# When using CMake 2.8.11 or later, header path dependencies
+# are automatically added to the gtest and gmock targets.
+# For earlier CMake versions, we have to explicitly add the
+# required directories to the header search path ourselves.
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+    include_directories("${gtest_SOURCE_DIR}/include"
+            "${gmock_SOURCE_DIR}/include")
+endif()
+
+set(SOURCE_FILES conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
+add_executable(cdynastat main.cpp ${SOURCE_FILES})
+target_link_libraries(cdynastat ${SHARED_LIBS})
+
+# Test definitions
+add_executable(allTests ${SOURCE_FILES} AbstractDynastat_unittest.cpp)
+target_link_libraries(allTests gtest_main gtest ${SHARED_LIBS})
