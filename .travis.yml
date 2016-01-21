@@ -16,7 +16,6 @@ addons:
     - libpulse-dev
     - libudev-dev
     - libxss-dev
-    - libxtst
     - libxtst-dev
     - libxv-dev
 #    Manually install arm deps
