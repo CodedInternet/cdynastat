@@ -34,6 +34,7 @@ install:
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
+  - git checkout -b 49 branch-heads/49
   - gclient sync
   - export GYP_DEFINES="$GYP_DEFINES clang=0"
   - sudo ./src/build/install-build-deps.sh --arm --no-prompt
