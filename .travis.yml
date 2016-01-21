@@ -21,6 +21,8 @@ addons:
 #    Manually install arm deps
     - libc6-dev-armhf-cross
     - g++-arm-linux-gnueabihf
+    - gcc-mingw-w64-i686
+    - gcc-mingw-w64-i686:i386
 cache:
   directories:
   - lib/webrtc
@@ -34,6 +36,7 @@ install:
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
+  - git fetch --tags
   - git checkout -b 49 branch-heads/49
   - gclient sync
   - export GYP_DEFINES="$GYP_DEFINES clang=0"
