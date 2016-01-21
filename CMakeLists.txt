@@ -15,19 +15,19 @@ IF(APPLE)
     SET(EXTRA_LIBS ${CARBON_LIBRARY} ${QUICKTIME_LIBRARY} ${APP_SERVICES_LIBRARY})
 ENDIF (APPLE)
 
-set(WEBRTC_SRC_DIR lib/webrtc/src/)
-link_directories(lib/webrtc/src/out/Release/)
-file(GLOB libwebrtc lib/webrtc/src/out/Release/*.a)
-include_directories(${WEBRTC_SRC_DIR})
+link_directories(lib)
+include_directories(include)
+
 
 find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 
+SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-amd64-r49.a)
 
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
 # Define shared libraries
-set(SHARED_LIBS ${libwebrtc} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+set(SHARED_LIBS ${WEBRTC_NAMES} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
 
 # gtest DownloadProject
 # https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
