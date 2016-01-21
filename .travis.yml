@@ -38,7 +38,7 @@ install:
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
   - cd src
   - git fetch --tags
-  - git checkout -b 49 branch-heads/49
+  - git checkout -b 48 branch-heads/48
   - gclient sync --with_branch_heads --jobs 16
   - export GYP_DEFINES="$GYP_DEFINES clang=0"
   - sudo ./build/install-build-deps.sh --arm --no-prompt
