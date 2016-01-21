@@ -7,20 +7,11 @@
 #include <json/reader.h>
 
 #include "conductor.h"
+//#include "Dynastat.h"
 #include "DynastatSimulator.h"
 
-static enum cmdValue {
-  eExit,
-  eOffer
-};
-
-static std::map<std::string, cmdValue> cmdMap;
-
-static void Initalize();
 
 int main(int argc, char *argv[]) {
-  Initalize();
-
   rtc::FlagList::SetFlagsFromCommandLine(&argc, argv, true);
   if (FLAG_help) {
     rtc::FlagList::Print(NULL, false);
@@ -43,32 +34,24 @@ int main(int argc, char *argv[]) {
 
   dynastat::DynastatSimulator* device = new dynastat::DynastatSimulator(root);
 
+  std::cout << "Please paste session description:";
+
+  std::string offer;
+  getline(std::cin, offer);
+
+  rtc::AutoThread autoThread;
+  rtc::Thread *thread = rtc::Thread::Current();
+
   webrtc::PeerConnectionInterface::IceServers servers;
   webrtc::PeerConnectionInterface::IceServer server;
   server.uri = "stun:stun.l.google.com:19302";
   servers.push_back(server);
 
-  std::string cmd;
-  bool running = true;
-  while(running) {
-    std::cin >> cmd;
-    switch(cmdMap[cmd]) {
-      case eExit:
-        running = false;
-        break;
+  Conductor conductor(offer, device);
 
-      default:
-        std::cout << "Unkown command \"" << cmd << "\". Type exit to quit.";
-    }
-  }
+  thread->Run();
 
   std::cout << "Exiting";
 
   return 0;
-}
-
-static void Initalize() {
-  cmdMap["exit"] = eExit;
-  cmdMap["q"] = eExit;
-  cmdMap["quit"] = eExit;
 }
