@@ -36,11 +36,12 @@ install:
   - export PATH=`pwd`/depot_tools:"$PATH"
   - cd lib/webrtc
   - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
+  - cd src
   - git fetch --tags
   - git checkout -b 49 branch-heads/49
   - gclient sync --with_branch_heads --jobs 16
   - export GYP_DEFINES="$GYP_DEFINES clang=0"
-  - sudo ./src/build/install-build-deps.sh --arm --no-prompt
+  - sudo ./build/install-build-deps.sh --arm --no-prompt
   - gclient runhooks
 before_script:
   - cd $TRAVIS_BUILD_DIR
