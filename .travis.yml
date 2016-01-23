@@ -2,6 +2,8 @@ language: cpp
 sudo: false
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - libjsoncpp-dev
     - "gobjc++-4.9"
