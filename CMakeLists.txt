@@ -34,6 +34,10 @@ download_project(PROJ jsoncpp
 
 add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+    include_directories("${jsoncpp_SOURCE_DIR}/include")
+endif ()
+
 IF (NOT ARCH)
     SET(ARCH "amd64")
 ENDIF (LINUX)
