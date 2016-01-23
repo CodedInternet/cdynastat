@@ -6,9 +6,7 @@ addons:
     sources:
     - ubuntu-toolchain-r-test
     packages:
-    - libjsoncpp-dev
     - libboost-all-dev
-    - libgtest-dev
 cache:
   directories:
   - lib/

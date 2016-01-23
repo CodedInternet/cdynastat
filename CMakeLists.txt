@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 2.8.2)
 project(cdynastat)
+include(DownloadProject.cmake)
+# https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
+if (CMAKE_VERSION VERSION_LESS 3.2)
+    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+else ()
+    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+endif ()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -19,12 +26,13 @@ ENDIF (APPLE)
 link_directories(lib)
 include_directories(include)
 
+download_project(PROJ jsoncpp
+        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
+        GIT_TAG 0.10.5
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
 
-find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
-
-IF (DEFINED ENV{TRAVIS})
-    include_directories(/usr/include/jsoncpp)
-ENDIF (DEFINED ENV{TRAVIS})
+add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 IF (NOT ARCH)
     SET(ARCH "amd64")
@@ -33,26 +41,17 @@ ENDIF (LINUX)
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
+set(SHARED_LIBS ${WEBRTC_NAMES} jsoncpp boost_thread-mt boost_system-mt)
 
-IF (APPLE)
-    # gtest DownloadProject
-    # https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
-    if (CMAKE_VERSION VERSION_LESS 3.2)
-        set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-    else ()
-        set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-    endif ()
+# gtest DownloadProject
 
-    include(DownloadProject.cmake)
-    download_project(PROJ googletest
-            GIT_REPOSITORY https://github.com/google/googletest.git
-            GIT_TAG master
-            ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-            )
+download_project(PROJ googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG master
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
 
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
-ENDIF (APPLE)
+add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 # When using CMake 2.8.11 or later, header path dependencies
 # are automatically added to the gtest and gmock targets.
