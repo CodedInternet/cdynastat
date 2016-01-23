@@ -1,50 +1,13 @@
 language: cpp
-sudo: required
-dist: precise
+sudo: false
 addons:
   apt:
     packages:
-    - libasound2-dev                                                                
-    - libexpat1-dev
-    - libgconf2-dev
-    - libgnome-keyring-dev
-    - libgtk2.0-dev
-    - libjpeg62-dev
-    - libjsoncpp-dev
-    - libnss3-dev
-    - libpci-dev
-    - libpulse-dev
-    - libudev-dev
-    - libxss-dev
-    - libxtst-dev
-    - libxv-dev
-#    Manually install arm deps
+#    Install arm deps
     - libc6-dev-armhf-cross
     - g++-arm-linux-gnueabihf
-    - gcc-mingw-w64-i686
-    - gcc-mingw-w64-i686:i386
 cache:
   directories:
-  - lib/webrtc
-env:
-  - GYP_CROSSCOMPILE=1 GYP_DEFINES="OS=linux target_arch=arm"
-before_install:
-  - unset CC
-  - unset CXX
-install:
-  - git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-  - export PATH=`pwd`/depot_tools:"$PATH"
-  - cd lib/webrtc
-  - if [ ! -d "src" ]; then fetch --no-history --nohooks webrtc; fi
-  - cd src
-  - git fetch --tags
-  - git checkout -b 48 branch-heads/48
-  - gclient sync --with_branch_heads --jobs 16
-  - export GYP_DEFINES="$GYP_DEFINES clang=0"
-  - sudo ./build/install-build-deps.sh --arm --no-prompt
-  - gclient runhooks
-before_script:
-  - cd $TRAVIS_BUILD_DIR
+  - lib/
 script:
-  - ninja -C lib/webrtc/src/out/Release
   - cmake . && make
