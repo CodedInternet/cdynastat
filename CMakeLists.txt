@@ -21,7 +21,11 @@ include_directories(include)
 
 find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 
-SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-amd64-r49.a)
+IF (NOT ARCH)
+    SET(ARCH "amd64")
+ENDIF ()
+
+SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 add_definitions("-x objective-c++") # as you already have
 set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
