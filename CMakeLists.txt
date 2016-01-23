@@ -21,7 +21,7 @@ include_directories(include)
 
 find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 
-IF (LINUX)
+IF (DEFINED ENV{TRAVIS})
     include_directories(/usr/include/jsoncpp)
 ENDIF (LINUX)
 
