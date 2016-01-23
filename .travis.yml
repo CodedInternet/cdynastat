@@ -3,6 +3,7 @@ sudo: false
 addons:
   apt:
     packages:
+    - libjsoncpp-dev
 #    Install arm deps
     - libc6-dev-armhf-cross
     - g++-arm-linux-gnueabihf
