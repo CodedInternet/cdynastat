@@ -20,7 +20,10 @@ include_directories(include)
 
 
 find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
-include_directories(jsoncpp jsoncpp/json jsonreader)
+
+IF (LINUX)
+    include_directories(/usr/include/jsoncpp)
+ENDIF (LINUX)
 
 IF (NOT ARCH)
     SET(ARCH "amd64")
