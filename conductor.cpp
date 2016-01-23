@@ -53,10 +53,11 @@ Conductor::Conductor(std::string offer, dynastat::AbstractDynastat *device) {
   this->device = device;
   peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
-  webrtc::PeerConnectionInterface::IceServers servers;
+
+  webrtc::PeerConnectionInterface::RTCConfiguration config;
   webrtc::PeerConnectionInterface::IceServer server;
   server.uri = "stun:stun.l.google.com:19302";
-  servers.push_back(server);
+  config.servers.push_back(server);
 
   bool dtls = true;
   webrtc::FakeConstraints constraints;
@@ -69,7 +70,7 @@ Conductor::Conductor(std::string offer, dynastat::AbstractDynastat *device) {
                             "false");
   }
 
-  peerConnection = peerConnectionFactory->CreatePeerConnection(servers,
+  peerConnection = peerConnectionFactory->CreatePeerConnection(config,
                                                                &constraints,
                                                                NULL,
                                                                NULL,

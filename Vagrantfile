@@ -39,7 +39,7 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
 
-  config.vm.synced_folder "/Volumes/Data/Users/ghost/Library/webrtc", "/Volumes/Data/Users/ghost/Library/webrtc"
+  config.vm.synced_folder "/Volumes/Data/Users/ghost/Library/webrtc", "/opt/webrtc"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -50,7 +50,7 @@ Vagrant.configure(2) do |config|
     #vb.gui = true
       # Customize the amount of memory on the VM:
     vb.memory = 8192
-    vb.cpus = 4
+    vb.cpus = 6
 
     vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
   end
