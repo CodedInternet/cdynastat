@@ -8,6 +8,7 @@
 #include <json/value.h>
 #include <boost/thread/thread.hpp>
 #include "AbstractDynastat.h"
+#include <mutex>
 
 namespace dynastat {
 class DynastatSimulator: public AbstractDynastat {
