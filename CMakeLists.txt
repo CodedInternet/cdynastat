@@ -13,6 +13,7 @@ IF(APPLE)
             QUICKTIME_LIBRARY
             APP_SERVICES_LIBRARY)
     SET(EXTRA_LIBS ${CARBON_LIBRARY} ${QUICKTIME_LIBRARY} ${APP_SERVICES_LIBRARY})
+    set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 ENDIF (APPLE)
 
 link_directories(lib)
@@ -23,16 +24,13 @@ find_library(JSONCPP_LIBRARY jsoncpp REQUIRED)
 
 IF (DEFINED ENV{TRAVIS})
     include_directories(/usr/include/jsoncpp)
-ENDIF (LINUX)
+ENDIF (DEFINED ENV{TRAVIS})
 
 IF (NOT ARCH)
     SET(ARCH "amd64")
-ENDIF ()
+ENDIF (LINUX)
 
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
-
-add_definitions("-x objective-c++") # as you already have
-set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
 
 # Define shared libraries
 set(SHARED_LIBS ${WEBRTC_NAMES} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
@@ -70,5 +68,5 @@ add_executable(cdynastat main.cpp ${SOURCE_FILES})
 target_link_libraries(cdynastat ${SHARED_LIBS})
 
 # Test definitions
-#add_executable(allTests ${SOURCE_FILES} AbstractDynastat_unittest.cpp)
-#target_link_libraries(allTests gtest_main gtest ${SHARED_LIBS})
+add_executable(allTests ${SOURCE_FILES} AbstractDynastat_unittest.cpp)
+target_link_libraries(allTests gtest_main gtest ${SHARED_LIBS})

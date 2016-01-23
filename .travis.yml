@@ -9,8 +9,6 @@ addons:
     - libjsoncpp-dev
     - libboost-all-dev
     - libgtest-dev
-    - gobjc++
-    - gobjc++-multilib
 cache:
   directories:
   - lib/
