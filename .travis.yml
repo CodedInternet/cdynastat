@@ -7,9 +7,14 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - libboost-all-dev
+env:
+#  - ARCH=amd64
+  - ARCH=arm
 cache:
   directories:
   - lib/
+install:
+  - wget https://ci-cloud.s3-eu-west-1.amazonaws.com/webrtc/libwebrtc-Linux-$ARCH-r49.a -P lib/
 script:
   - cmake .
   - make
