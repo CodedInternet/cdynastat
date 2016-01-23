@@ -6,7 +6,8 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - libjsoncpp-dev
-    - "gobjc++-4.9"
+    - gobjc++-4.9
+    - gobjc++-4.9-multilib
 cache:
   directories:
   - lib/
