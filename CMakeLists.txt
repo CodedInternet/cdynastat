@@ -36,7 +36,9 @@ add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 include_directories("${jsoncpp_SOURCE_DIR}/include")
 
-IF (NOT ARCH)
+IF (DEFINED $ENV{ARCH})
+    SET(ARCH $ENV{ARCH})
+ELSE ()
     SET(ARCH "amd64")
 ENDIF (LINUX)
 
