@@ -4,11 +4,12 @@ addons:
   apt:
     packages:
     - libjsoncpp-dev
+    - g++-4.8
     - gobjc++-4.8
     - gobjc++-4.8-multilib
 #    Install arm deps
     - libc6-dev-armhf-cross
-    - g++-arm-linux-gnueabihf
+    - g++-4.8-arm-linux-gnueabihf
     - gobjc++-arm-linux-gnueabihf
 cache:
   directories:
