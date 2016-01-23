@@ -11,5 +11,6 @@ cache:
   directories:
   - lib/
 script:
-  - cmake . && make
+  - cmake .
+  - make
 
