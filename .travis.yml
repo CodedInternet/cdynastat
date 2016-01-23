@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
     - libjsoncpp-dev
+    - "gobjc++-4.9"
 cache:
   directories:
   - lib/
