@@ -3,8 +3,12 @@ sudo: required
 dist: trusty
 addons:
   apt:
+    sources:
+    - ubuntu-toolchain-r-test
     packages:
     - libjsoncpp-dev
+    - gobjc++
+    - gobjc++-multilib
 cache:
   directories:
   - lib/
