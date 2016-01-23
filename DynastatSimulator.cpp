@@ -61,7 +61,7 @@ SimulatedSensor::SimulatedSensor(int zeroValue, int halfValue, int fullValue) {
   boost::random::mt19937 rng;
   boost::random::uniform_int_distribution<> range(0, max);
   value = range(rng);
-  worker = new boost::thread((boost::thread &&) [=] { updateValue(); });
+  worker = new boost::thread(boost::bind(&SimulatedSensor::updateValue, this));
 }
 
 int SimulatedSensor::readValue() {
