@@ -37,22 +37,24 @@ set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -
 # Define shared libraries
 set(SHARED_LIBS ${WEBRTC_NAMES} ${JSONCPP_LIBRARY} boost_thread-mt boost_system-mt)
 
-# gtest DownloadProject
-# https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
-if (CMAKE_VERSION VERSION_LESS 3.2)
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
-else()
-    set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
-endif()
+IF (APPLE)
+    # gtest DownloadProject
+    # https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
+    if (CMAKE_VERSION VERSION_LESS 3.2)
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
+    else ()
+        set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
+    endif ()
 
-include(DownloadProject.cmake)
-download_project(PROJ                googletest
-        GIT_REPOSITORY      https://github.com/google/googletest.git
-        GIT_TAG             master
-        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-        )
+    include(DownloadProject.cmake)
+    download_project(PROJ googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG master
+            ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+            )
 
-add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+ENDIF (APPLE)
 
 # When using CMake 2.8.11 or later, header path dependencies
 # are automatically added to the gtest and gmock targets.

@@ -8,6 +8,7 @@ addons:
     packages:
     - libjsoncpp-dev
     - libboost-all-dev
+    - libgtest-dev
     - gobjc++
     - gobjc++-multilib
 cache:
