@@ -8,6 +8,10 @@ else ()
     set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
 endif ()
 
+if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8")
+    message(FATAL_ERROR "Insufficent gcc version. >= 4.8 required")
+ENDIF()
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 IF(APPLE)
@@ -40,7 +44,7 @@ IF (DEFINED $ENV{ARCH})
     SET(ARCH $ENV{ARCH})
 ELSE ()
     SET(ARCH "amd64")
-ENDIF (LINUX)
+ENDIF ()
 
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
