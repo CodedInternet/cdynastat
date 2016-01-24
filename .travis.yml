@@ -16,7 +16,7 @@ cache:
   directories:
   - lib/
 install:
-  - wget https://ci-cloud.s3-eu-west-1.amazonaws.com/webrtc/libwebrtc-Linux-$ARCH-r49.a -P lib/
+  - wget -nc https://ci-cloud.s3-eu-west-1.amazonaws.com/webrtc/libwebrtc-Linux-$ARCH-r49.a -P lib/
 script:
   - cmake . -DCMAKE_CXX_COMPILER=$CMAKE_CXX -DCMAKE_C_COMPILER=$CMAKE_CC
   - make
