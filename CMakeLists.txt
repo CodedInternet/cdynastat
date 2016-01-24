@@ -36,15 +36,13 @@ add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 include_directories("${jsoncpp_SOURCE_DIR}/include")
 
-#download_project(PROJ boost
-#        GIT_REPOSITORY https://github.com/boostorg/boost.git
-#        GIT_TAG boost-1.60.0
-#        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#        )
+download_project(PROJ boost
+        GIT_REPOSITORY https://github.com/boostorg/boost.git
+        GIT_TAG boost-1.60.0
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
 
-IF (DEFINED $ENV{ARCH})
-    SET(ARCH $ENV{ARCH})
-ELSE ()
+IF (NOT DEFINED ARCH)
     SET(ARCH "amd64")
 ENDIF ()
 
