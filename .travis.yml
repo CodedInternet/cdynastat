@@ -15,7 +15,6 @@ env:
 cache:
   directories:
   - lib/
-  - boost-src
 install:
   - wget -nc https://ci-cloud.s3-eu-west-1.amazonaws.com/webrtc/libwebrtc-Linux-$ARCH-r49.a -P lib/
 script:
