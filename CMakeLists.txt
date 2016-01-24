@@ -8,8 +8,8 @@ else ()
     set(UPDATE_DISCONNECTED_IF_AVAILABLE "UPDATE_DISCONNECTED 1")
 endif ()
 
-if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8")
-    message(FATAL_ERROR "Insufficent gcc version. >= 4.8 required")
+if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.8)
+    message(FATAL_ERROR "Insufficent gcc version. ${CMAKE_CXX_COMPILER_VERSION} <= 4.8 ")
 ENDIF()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -39,6 +39,12 @@ download_project(PROJ jsoncpp
 add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 include_directories("${jsoncpp_SOURCE_DIR}/include")
+
+#download_project(PROJ boost
+#        GIT_REPOSITORY https://github.com/boostorg/boost.git
+#        GIT_TAG boost-1.60.0
+#        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+#        )
 
 IF (DEFINED $ENV{ARCH})
     SET(ARCH $ENV{ARCH})
