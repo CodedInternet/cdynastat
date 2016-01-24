@@ -7,7 +7,7 @@ addons:
     packages:
     - libboost-all-dev
     - g++-4.9
-    - g++-4.9-arm-linux-gnueabi
+#    - g++-4.9-arm-linux-gnueabi
     - g++-4.9-multilib
 env:
   - ARCH=amd64 CC=gcc-4.9 CXX=g++-4.9
@@ -18,6 +18,6 @@ cache:
 install:
   - wget https://ci-cloud.s3-eu-west-1.amazonaws.com/webrtc/libwebrtc-Linux-$ARCH-r49.a -P lib/
 script:
-  - cmake . -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_CC_COMPILER=$CC
+  - cmake . -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_COMPILER=$CC
   - make
 
