@@ -1,15 +1,17 @@
 language: cpp
-sudo: required
-dist: trusty
+sudo: false
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
     - libboost-all-dev
+    - g++-4.9
+    - g++-4.9-arm-linux-gnueabi
+    - g++-4.9-multilib
 env:
-#  - ARCH=amd64
-  - ARCH=arm
+  - ARCH=amd64 CC=gcc-4.9 CXX=g++-4.9
+#  - ARCH=arm CC=arm-linux-gnueabihf-gcc-4.9 CXX=arm-linux-gnueabihf-g++-4.9
 cache:
   directories:
   - lib/
