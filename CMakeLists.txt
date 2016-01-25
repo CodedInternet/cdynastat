@@ -16,6 +16,8 @@ IF(APPLE)
     FIND_LIBRARY(CARBON_LIBRARY Carbon)
     FIND_LIBRARY(QUICKTIME_LIBRARY QuickTime )
     FIND_LIBRARY(APP_SERVICES_LIBRARY ApplicationServices )
+    INCLUDE_DIRECTORIES(/usr/local/opt/boost155/include)
+    LINK_DIRECTORIES(/usr/local/opt/boost155/lib)
     MARK_AS_ADVANCED (CARBON_LIBRARY
             QUICKTIME_LIBRARY
             APP_SERVICES_LIBRARY)
@@ -26,16 +28,6 @@ ENDIF (APPLE)
 link_directories(lib)
 include_directories(include)
 
-download_project(PROJ jsoncpp
-        GIT_REPOSITORY https://github.com/open-source-parsers/jsoncpp.git
-        GIT_TAG 0.10.5
-        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-        )
-
-add_subdirectory(${jsoncpp_SOURCE_DIR} ${jsoncpp_BINARY_DIR} EXCLUDE_FROM_ALL)
-
-include_directories("${jsoncpp_SOURCE_DIR}/include")
-
 IF (NOT DEFINED ARCH)
     SET(ARCH "amd64")
 ENDIF ()
@@ -43,7 +35,7 @@ ENDIF ()
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES} jsoncpp boost_thread-mt boost_system-mt)
+set(SHARED_LIBS ${WEBRTC_NAMES} boost_thread-mt boost_system-mt)
 
 # gtest DownloadProject
 
