@@ -13,6 +13,7 @@ addons:
     # Shared Library dependances from webrtc
     - libx11-dev
     - xorg-dev
+    - libpulse-dev
 env:
   - ARCH=amd64 CMAKE_CC=gcc-4.9 CMAKE_CXX=g++-4.9
 #  - ARCH=arm CC=arm-linux-gnueabihf-gcc-4.9 CXX=arm-linux-gnueabihf-g++-4.9
