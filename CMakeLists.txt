@@ -26,7 +26,6 @@ IF(APPLE)
 
     SET(BOOST_LIBS boost_thread-mt boost_system-mt)
 ELSE()
-    SET(EXTRA_LIBS libX11)
     SET(BOOST_LIBS boost_thread boost_system)
 ENDIF ()
 
