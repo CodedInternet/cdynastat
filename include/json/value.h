@@ -5,7 +5,7 @@
 #ifndef CPPTL_JSON_H_INCLUDED
 # define CPPTL_JSON_H_INCLUDED
 #if !defined(JSON_IS_AMALGAMATION)
-# include "third_party/jsoncpp/source/include/json/forwards.h"
+# include "json/forwards.h"
 #endif // if !defined(JSON_IS_AMALGAMATION)
 # include <string>
 # include <vector>
