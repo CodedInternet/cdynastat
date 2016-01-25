@@ -16,17 +16,13 @@ IF(APPLE)
     FIND_LIBRARY(CARBON_LIBRARY Carbon)
     FIND_LIBRARY(QUICKTIME_LIBRARY QuickTime )
     FIND_LIBRARY(APP_SERVICES_LIBRARY ApplicationServices )
-    INCLUDE_DIRECTORIES(/usr/local/opt/boost155/include)
+    SET(BOOST_ROOT /usr/local/opt/boost155)
     LINK_DIRECTORIES(/usr/local/opt/boost155/lib)
     MARK_AS_ADVANCED (CARBON_LIBRARY
             QUICKTIME_LIBRARY
             APP_SERVICES_LIBRARY)
     SET(EXTRA_LIBS ${CARBON_LIBRARY} ${QUICKTIME_LIBRARY} ${APP_SERVICES_LIBRARY})
     set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
-
-    SET(BOOST_LIBS boost_thread-mt boost_system-mt)
-ELSE()
-    SET(BOOST_LIBS boost_thread boost_system)
 ENDIF ()
 
 # Dependancy includes
@@ -39,6 +35,14 @@ IF ( X11_FOUND )
     MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
 ENDIF ( X11_FOUND )
 
+MESSAGE ( STATUS "Searching for Boost" )
+FIND_PACKAGE ( Boost 1.55 REQUIRED COMPONENTS thread system )
+IF ( Boost_FOUND )
+    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+    LINK_LIBRARIES( ${Boost_LIBRARIES} )
+    MESSAGE( STATUS " Boost_INCLUDE_DIR: " ${Boost_INCLUDE_DIR} )
+    MESSAGE( STATUS " Boost_LIBRARIES: " ${Boost_LIBRARIES} )
+ENDIF ( Boost_FOUND )
 
 # Project includes
 link_directories(lib)
@@ -51,7 +55,7 @@ ENDIF ()
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES} ${BOOST_LIBS} ${EXTRA_LIBS})
+set(SHARED_LIBS ${WEBRTC_NAMES})
 
 # gtest DownloadProject
 
