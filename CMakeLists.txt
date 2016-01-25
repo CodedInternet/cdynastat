@@ -29,6 +29,18 @@ ELSE()
     SET(BOOST_LIBS boost_thread boost_system)
 ENDIF ()
 
+# Dependancy includes
+MESSAGE ( STATUS "Searching for X11..." )
+FIND_PACKAGE ( X11 REQUIRED )
+IF ( X11_FOUND )
+    INCLUDE_DIRECTORIES ( ${X11_INCLUDE_DIR} )
+    LINK_LIBRARIES ( ${X11_LIBRARIES} )
+    MESSAGE ( STATUS " X11_INCLUDE_DIR: " ${X11_INCLUDE_DIR} )
+    MESSAGE ( STATUS " X11_LIBRARIES: " ${X11_LIBRARIES} )
+ENDIF ( X11_FOUND )
+
+
+# Project includes
 link_directories(lib)
 include_directories(include)
 
