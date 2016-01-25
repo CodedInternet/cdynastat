@@ -12,7 +12,7 @@ Dynastat::Dynastat(Json::Value &config) {
     case 1: {
       const Json::Value motorConfig = config["motors"];
       for (Json::ValueIterator itr = motorConfig.begin(); itr != motorConfig.end(); itr++) {
-        Json::Value conf = motorConfig[itr.name()];
+        Json::Value conf = motorConfig[itr.memberName()];
         if (conf == false or conf.get("address", 0).asInt()) {
           continue;
         }
