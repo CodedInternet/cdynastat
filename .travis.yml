@@ -11,7 +11,7 @@ addons:
 #    - g++-4.9-arm-linux-gnueabi
     - g++-4.9-multilib
     # Shared Library dependances from webrtc
-    - libx11-6
+    - libx11-dev
     - xorg-dev
 env:
   - ARCH=amd64 CMAKE_CC=gcc-4.9 CMAKE_CXX=g++-4.9
