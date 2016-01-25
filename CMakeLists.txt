@@ -23,7 +23,11 @@ IF(APPLE)
             APP_SERVICES_LIBRARY)
     SET(EXTRA_LIBS ${CARBON_LIBRARY} ${QUICKTIME_LIBRARY} ${APP_SERVICES_LIBRARY})
     set(CMAKE_EXE_LINKER_FLAGS "-framework ServiceManagement -framework Foundation -framework Cocoa -framework AudioToolbox -framework AudioUnit -framework CoreAudio")
-ENDIF (APPLE)
+
+    SET(BOOST_LIBS boost_thread-mt boost_system-mt)
+ELSE()
+    SET(BOOST_LIBS boost_thread boost_system)
+ENDIF ()
 
 link_directories(lib)
 include_directories(include)
@@ -35,7 +39,7 @@ ENDIF ()
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES} boost_thread-mt boost_system-mt)
+set(SHARED_LIBS ${WEBRTC_NAMES} ${BOOST_LIBS})
 
 # gtest DownloadProject
 
