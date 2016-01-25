@@ -55,29 +55,29 @@ class Conductor
   rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
   dynastat::AbstractDynastat* device;
 
-  virtual void OnStateChange();
+  virtual void OnStateChange() override;
 
-  virtual void OnMessage(const webrtc::DataBuffer &buffer);
+  virtual void OnMessage(const webrtc::DataBuffer &buffer) override;
 
-  virtual void OnRenegotiationNeeded();
+  virtual void OnRenegotiationNeeded() override;
 
-  virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc);
+  virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc) override;
 
-  virtual void OnFailure(const std::string &error);
+  virtual void OnFailure(const std::string &error) override;
 
   Conductor(std::string offer, dynastat::AbstractDynastat *device);
 
-  virtual int AddRef() const;
+  virtual int AddRef() const override;
 
-  virtual int Release() const;
+  virtual int Release() const override;
 
-  virtual void OnAddStream(webrtc::MediaStreamInterface *stream);
+  virtual void OnAddStream(webrtc::MediaStreamInterface *stream) override;
 
-  virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream);
+  virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream) override;
 
-  virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel);
+  virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel) override;
 
-  virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate);
+  virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate) override;
 
   virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
 
