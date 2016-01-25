@@ -26,6 +26,7 @@ IF(APPLE)
 
     SET(BOOST_LIBS boost_thread-mt boost_system-mt)
 ELSE()
+    SET(EXTRA_LIBS libX11)
     SET(BOOST_LIBS boost_thread boost_system)
 ENDIF ()
 
@@ -39,7 +40,7 @@ ENDIF ()
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES} ${BOOST_LIBS})
+set(SHARED_LIBS ${WEBRTC_NAMES} ${BOOST_LIBS} ${EXTRA_LIBS})
 
 # gtest DownloadProject
 
