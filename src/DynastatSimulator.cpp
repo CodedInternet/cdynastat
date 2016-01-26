@@ -3,7 +3,7 @@
 //
 #include <boost/random.hpp>
 
-#include "DynastatSimulator.h"
+#include "cdynastat/DynastatSimulator.h"
 
 namespace dynastat {
 

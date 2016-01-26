@@ -1,14 +1,14 @@
 #define WEBRTC_POSIX
 
-#include "flagdefs.h"
+#include "cdynastat/flagdefs.h"
 
 #include <iostream>
 #include <fstream>
 #include <json/reader.h>
 
-#include "conductor.h"
+#include "cdynastat/conductor.h"
 //#include "Dynastat.h"
-#include "DynastatSimulator.h"
+#include "cdynastat/DynastatSimulator.h"
 
 
 int main(int argc, char *argv[]) {
@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 
   Conductor conductor(offer, device);
 
-  thread->Run();
+  thread->Start();
 
   std::cout << "Exiting";
 

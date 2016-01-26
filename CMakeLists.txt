@@ -76,10 +76,8 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
             "${gmock_SOURCE_DIR}/include")
 endif()
 
-set(SOURCE_FILES conductor.cpp conductor.h AbstractDynastat.h Dynastat.cpp Dynastat.h AbstractDynastat.cpp DynastatSimulator.cpp DynastatSimulator.h)
-add_executable(cdynastat main.cpp ${SOURCE_FILES})
-target_link_libraries(cdynastat ${SHARED_LIBS})
+# Main executable
+add_subdirectory(src)
 
 # Test definitions
-add_executable(allTests ${SOURCE_FILES} AbstractDynastat_unittest.cpp)
-target_link_libraries(allTests gtest_main gtest ${SHARED_LIBS})
+add_subdirectory(test)
