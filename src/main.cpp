@@ -1,14 +1,14 @@
 #define WEBRTC_POSIX
 
-#include "cdynastat/flagdefs.h"
+#include "flagdefs.h"
 
 #include <iostream>
 #include <fstream>
 #include <json/reader.h>
 
-#include "cdynastat/conductor.h"
+#include "conductor.h"
 //#include "Dynastat.h"
-#include "cdynastat/DynastatSimulator.h"
+#include "DynastatSimulator.h"
 
 
 int main(int argc, char *argv[]) {

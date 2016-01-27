@@ -2,7 +2,7 @@
 // Created by Tom Price on 15/12/2015.
 //
 
-#include "cdynastat/Dynastat.h"
+#include "Dynastat.h"
 
 
 namespace dynastat {

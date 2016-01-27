@@ -2,14 +2,11 @@
 // Created by Tom Price on 15/12/2015.
 //
 
-#include "cdynastat/conductor.h"
+#include "conductor.h"
 
-#include <string>
 #include <boost/thread.hpp>
-
 #include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
-#include "cdynastat/AbstractDynastat.h"
 
 
 void Conductor::count() {

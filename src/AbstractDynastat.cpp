@@ -2,7 +2,7 @@
 #include <cmath>
 #include <json/value.h>
 
-#include "cdynastat/AbstractDynastat.h"
+#include "AbstractDynastat.h"
 
 namespace dynastat {
 
