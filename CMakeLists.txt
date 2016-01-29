@@ -44,6 +44,18 @@ IF ( Boost_FOUND )
     MESSAGE( STATUS " Boost_LIBRARIES: " ${Boost_LIBRARIES} )
 ENDIF ( Boost_FOUND )
 
+MESSAGE( STATUS "Searching for OpenSSL")
+FIND_PACKAGE( OpenSSL REQUIRED )
+IF ( OpenSSL_FOUND )
+    INCLUDE_DIRECTORIES( ${OpenSSL_INCLUDE_DIR} )
+    LINK_LIBRARIES( ${OpenSSL_LIBRARIES} )
+    MESSAGE( STATUS " OpenSSL_INCLUDE_DIR: " ${OpenSSL_INCLUDE_DIR} )
+    MESSAGE( STATUS " OpenSSL_LIBRARIES: " ${OpenSSL_LIBRARIES} )
+ENDIF ( OpenSSL_FOUND )
+
+
+
+
 # Project includes
 link_directories(lib)
 include_directories(include)
@@ -52,13 +64,21 @@ IF (NOT DEFINED ARCH)
     SET(ARCH "amd64")
 ENDIF ()
 
+download_project(PROJ websocketpp
+        GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+        GIT_TAG 0.6.0
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+
+add_subdirectory(${websocketpp_SOURCE_DIR} ${websocketpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+include_directories(${websocketpp_SOURCE_DIR})
+
 SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # Define shared libraries
 set(SHARED_LIBS ${WEBRTC_NAMES})
 
 # gtest DownloadProject
-
 download_project(PROJ googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
         GIT_TAG master
