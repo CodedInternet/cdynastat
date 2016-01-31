@@ -28,7 +28,7 @@
 // Additional related material can be found in the tutorials/utility_client
 // directory of the WebSocket++ repository.
 
-#include <websocketpp/config/asio_no_tls_client.hpp>
+#include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
 #include <websocketpp/common/thread.hpp>
@@ -40,7 +40,7 @@
 #include <string>
 #include <sstream>
 
-typedef websocketpp::client<websocketpp::config::asio_client> client;
+typedef websocketpp::client<websocketpp::config::asio_tls_client> client;
 
 class connection_metadata {
  public:
@@ -135,6 +135,10 @@ class websocket_endpoint {
   websocket_endpoint () : m_next_id(0) {
     m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
     m_endpoint.clear_error_channels(websocketpp::log::elevel::all);
+
+    m_endpoint.set_tls_init_handler([this](websocketpp::connection_hdl) {
+        return websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context_base::sslv23);
+    });
 
     m_endpoint.init_asio();
     m_endpoint.start_perpetual();
