@@ -73,7 +73,7 @@ download_project(PROJ websocketpp
 add_subdirectory(${websocketpp_SOURCE_DIR} ${websocketpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 include_directories(${websocketpp_SOURCE_DIR})
 
-LINK_LIBRARIES(libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
+set(LIBWEBRTC libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # gtest DownloadProject
 download_project(PROJ googletest
@@ -94,6 +94,7 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 #endif()
 
 # Main executable
+SET(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 add_subdirectory(src)
 
 # Test definitions

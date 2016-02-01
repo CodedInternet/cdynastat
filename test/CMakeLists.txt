@@ -1,4 +1,5 @@
 # Test definitions
 include_directories(../src)
-add_executable(allTests AbstractDynastat_unittest.cpp PeerConnectionClient_unittest.cpp)
-target_link_libraries(allTests gtest_main gtest gmock ${SHARED_LIBS} AbstractDynastat PeerConnectionClient)
+SET(TEST_SOURCES ${SOURCE_DIR}/AbstractDynastat.cpp ${SOURCE_DIR}/PeerConnectionClient.cpp)
+add_executable(allTests AbstractDynastat_unittest.cpp PeerConnectionClient_unittest.cpp ${TEST_SOURCES})
+target_link_libraries(allTests gtest gtest_main gmock ${LIBWEBRTC})
