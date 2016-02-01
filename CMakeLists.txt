@@ -91,10 +91,10 @@ add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_
 # are automatically added to the gtest and gmock targets.
 # For earlier CMake versions, we have to explicitly add the
 # required directories to the header search path ourselves.
-if (CMAKE_VERSION VERSION_LESS 2.8.11)
+#if (CMAKE_VERSION VERSION_LESS 2.8.11)
     include_directories("${gtest_SOURCE_DIR}/include"
             "${gmock_SOURCE_DIR}/include")
-endif()
+#endif()
 
 # Main executable
 add_subdirectory(src)
