@@ -12,62 +12,77 @@
 #include <json/value.h>
 
 namespace dynastat {
-class ValueError: public std::exception {
+    class ValueError : public std::exception {
 
-};
+    };
 
-class AbstractSensor {
- public:
-  virtual ~AbstractSensor() { };
-  virtual int readValue() = 0;
-  virtual int scaleValue(int val);
+    class AbstractSensor {
+    public:
+        AbstractSensor() { };
 
- protected:
-  virtual void setScale(int zeroValue, int halfValue, int fullValue);
+        virtual ~AbstractSensor() { };
 
-  const int bits = 8;
-  int zeroValue;
-  double scale;
-};
+        virtual int readValue() = 0;
 
-class AbstractMotor {
- public:
-  virtual ~AbstractMotor() { };
-  virtual int getPosition() = 0;
-  virtual void setPosition(int pos) = 0;
+        virtual int scaleValue(int val);
 
- protected:
-  const int bits = 8;
-  int rawLow;
-  int rawHigh;
+    protected:
+        virtual void setScale(int zeroValue, int halfValue, int fullValue);
 
-  int position = 2 ^bits - 1 / 2;
+        const int bits = 8;
+        int zeroValue;
+        double scale;
+    };
 
- private:
-  virtual int scalePos(int val, bool up = true);
-  virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
-};
+    class AbstractMotor {
+    public:
+        AbstractMotor() { };
 
-class AbstractDynastat {
- public:
-  virtual ~AbstractDynastat();
-  virtual int readSensor(std::string name, int id);
-  virtual Json::Value readSensors();
-  virtual int readMotor(std::string name);
-  virtual void setMotor(std::string name, int pos);
+        virtual ~AbstractMotor() { };
 
-  const char *kConfSensors = "sensors";
-  const char *kConfRows = "rows";
-  const char *kConfCols = "cols";
-  const char *kConfZeroValue = "zero_value";
-  const char *kConfHalfValue = "half_value";
-  const char *kConfFullValue = "full_value";
-  const char *kConfBaseAddress = "base_address";
+        virtual int getPosition() = 0;
 
- protected:
-  std::map<std::string, AbstractMotor *> motors;
-  std::map<std::string, std::map<int, AbstractSensor *> *> sensors;
-};
+        virtual void setPosition(int pos) = 0;
+
+    protected:
+        const int bits = 8;
+        int rawLow;
+        int rawHigh;
+
+        int position = 2 ^bits - 1 / 2;
+
+    private:
+        virtual int scalePos(int val, bool up = true);
+
+        virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
+    };
+
+    class AbstractDynastat {
+    public:
+        AbstractDynastat() { };
+
+        virtual ~AbstractDynastat();
+
+        virtual int readSensor(std::string name, int id);
+
+        virtual Json::Value readSensors();
+
+        virtual int readMotor(std::string name);
+
+        virtual void setMotor(std::string name, int pos);
+
+        const char *kConfSensors = "sensors";
+        const char *kConfRows = "rows";
+        const char *kConfCols = "cols";
+        const char *kConfZeroValue = "zero_value";
+        const char *kConfHalfValue = "half_value";
+        const char *kConfFullValue = "full_value";
+        const char *kConfBaseAddress = "base_address";
+
+    protected:
+        std::map<std::string, AbstractMotor *> motors;
+        std::map<std::string, std::map<int, AbstractSensor *> *> sensors;
+    };
 }
 
 #endif //CDYNASTAT_DYNASTATINTERFACE_H
