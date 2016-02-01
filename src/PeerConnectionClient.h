@@ -6,10 +6,12 @@
 #define CDYNASTAT_PEERCONNECTIONCLIENT_H
 
 #include <websocketpp/config/asio_client.hpp>
+#include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
 namespace dynastat {
-    typedef websocketpp::client<websocketpp::config::asio_tls_client> ssl_client;
+    typedef websocketpp::client<websocketpp::config::asio_client> client_plain;
+    typedef websocketpp::client<websocketpp::config::asio_tls_client> client_tls;
     typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
 
     class PeerConnectionListener {
@@ -28,25 +30,34 @@ namespace dynastat {
             CLOSED
         };
 
-        ConnectionMetadata(int id, websocketpp::connection_hdl hdl, std::string uri) :
+        ConnectionMetadata(int id, websocketpp::connection_hdl hdl, std::string uri, bool secure = true) :
                 m_id(id),
                 m_hdl(hdl),
                 m_status(CONNECTING),
-                m_uri(uri) { };
+                m_uri(uri),
+                m_secure(secure) { };
 
-        void on_open(ssl_client *c, websocketpp::connection_hdl hdl);
+        int get_id();
 
-        void on_fail(ssl_client *c, websocketpp::connection_hdl hdl);
+        template<typename ClientType>
+        void on_open(ClientType *c, websocketpp::connection_hdl hdl);
 
-        void on_close(ssl_client *c, websocketpp::connection_hdl hdl);
+        template<typename ClientType>
+        void on_fail(ClientType *c, websocketpp::connection_hdl hdl);
 
-        void on_message(websocketpp::connection_hdl hdl, ssl_client::message_ptr msg);
+        template<typename ClientType>
+        void on_close(ClientType *c, websocketpp::connection_hdl hdl);
 
-        const Status &get_status() {
+        template<typename ClientType>
+        void on_message(websocketpp::connection_hdl hdl, typename ClientType::message_ptr msg);
+
+        Status get_status() {
             return m_status;
         }
 
         websocketpp::connection_hdl get_hdl() const;
+
+        bool get_secure();
 
         void add_listener(PeerConnectionListener *listener);
 
@@ -57,6 +68,7 @@ namespace dynastat {
         std::string m_uri;
         std::string m_server;
         std::string m_error_reason;
+        bool m_secure;
 
         std::vector<PeerConnectionListener *> message_listeners;
     };
@@ -82,8 +94,11 @@ namespace dynastat {
     private:
         typedef std::map<int, ConnectionMetadata::ptr> con_list;
 
-        ssl_client m_endpoint;
-        websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_thread;
+        client_plain m_endpoint_plain;
+        client_tls m_endpoint_tls;
+
+        websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_thread_plain;
+        websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_thread_tls;
 
         con_list m_connection_list;
         int m_next_id = 0;

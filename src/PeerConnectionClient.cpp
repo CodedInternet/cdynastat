@@ -6,67 +6,148 @@
 
 namespace dynastat {
     PeerConnectionClient::PeerConnectionClient() {
-        m_endpoint.clear_access_channels(websocketpp::log::alevel::all);
-        m_endpoint.clear_error_channels(websocketpp::log::elevel::all);
+        m_endpoint_plain.clear_access_channels(websocketpp::log::alevel::all);
+        m_endpoint_plain.clear_error_channels(websocketpp::log::elevel::all);
+        m_endpoint_plain.init_asio();
+        m_endpoint_plain.start_perpetual();
 
-        m_endpoint.init_asio();
-        m_endpoint.start_perpetual();
+        m_endpoint_tls.clear_access_channels(websocketpp::log::alevel::all);
+        m_endpoint_tls.clear_error_channels(websocketpp::log::elevel::all);
 
-        m_endpoint.set_tls_init_handler(websocketpp::lib::bind(
+        m_endpoint_tls.init_asio();
+        m_endpoint_tls.start_perpetual();
+
+        m_endpoint_tls.set_tls_init_handler(websocketpp::lib::bind(
                 &PeerConnectionClient::on_tls_init,
                 this,
                 websocketpp::lib::placeholders::_1
         ));
 
-        m_thread = websocketpp::lib::make_shared<websocketpp::lib::thread>(&ssl_client::run, &m_endpoint);
+        m_thread_plain = websocketpp::lib::make_shared<websocketpp::lib::thread>(&client_plain::run, &m_endpoint_plain);
+        m_thread_tls = websocketpp::lib::make_shared<websocketpp::lib::thread>(&client_tls::run, &m_endpoint_tls);
     }
 
     PeerConnectionClient::~PeerConnectionClient() {
-        m_endpoint.stop_perpetual();
-    }
+        m_endpoint_plain.stop_perpetual();
+        m_endpoint_tls.stop_perpetual();
 
-    int PeerConnectionClient::connect(std::string const &uri) {
-        websocketpp::lib::error_code ec;
+        for (con_list::const_iterator it = m_connection_list.begin(); it != m_connection_list.end(); ++it) {
+            if (it->second->get_status() != ConnectionMetadata::OPEN) {
+                // Only close open connections
+                continue;
+            }
 
-        ssl_client::connection_ptr con = m_endpoint.get_connection(uri, ec);
+            std::cerr << "> Closing connection " << it->second->get_id() << std::endl;
 
-        if (ec) {
-            std::cerr << "> Connection initialization error: " << ec.message() << std::endl;
-            return -1;
+            websocketpp::lib::error_code ec;
+            if (it->second->get_secure()) {
+                m_endpoint_tls.close(it->second->get_hdl(), websocketpp::close::status::going_away, "", ec);
+            } else {
+                m_endpoint_plain.close(it->second->get_hdl(), websocketpp::close::status::going_away, "", ec);
+            }
+            if (ec) {
+                std::cerr << "> Error closing connection " << it->second->get_id() << ": "
+                << ec.message() << std::endl;
+            }
         }
 
-        int new_id = m_next_id++;
-        ConnectionMetadata::ptr metadata_ptr = websocketpp::lib::make_shared<ConnectionMetadata>(new_id,
-                                                                                                 con->get_handle(),
-                                                                                                 uri);
-        m_connection_list[new_id] = metadata_ptr;
+        m_thread_plain->join();
+        m_thread_tls->join();
+    }
 
-        con->set_open_handler(websocketpp::lib::bind(
-                &ConnectionMetadata::on_open,
-                metadata_ptr,
-                &m_endpoint,
-                websocketpp::lib::placeholders::_1
-        ));
-        con->set_fail_handler(websocketpp::lib::bind(
-                &ConnectionMetadata::on_fail,
-                metadata_ptr,
-                &m_endpoint,
-                websocketpp::lib::placeholders::_1
-        ));
-        con->set_close_handler(websocketpp::lib::bind(
-                &ConnectionMetadata::on_close,
-                metadata_ptr,
-                &m_endpoint,
-                websocketpp::lib::placeholders::_1
-        ));
-        con->set_message_handler(websocketpp::lib::bind(
-                &ConnectionMetadata::on_message,
-                metadata_ptr,
-                websocketpp::lib::placeholders::_1,
-                websocketpp::lib::placeholders::_2
-        ));
+    int PeerConnectionClient::connect(std::string const &url) {
+        websocketpp::lib::error_code ec;
+        websocketpp::uri *uri;
+        uri = new websocketpp::uri(url);
 
-        m_endpoint.connect(con);
+        int new_id;
+
+        if (!uri->get_secure()) {
+            client_plain::connection_ptr con_plain = m_endpoint_plain.get_connection(url, ec);
+
+            if (ec) {
+                std::cerr << "> Connection initialization error: " << ec.message() << std::endl;
+                return -1;
+            }
+
+            new_id = m_next_id++;
+            ConnectionMetadata::ptr metadata_ptr = websocketpp::lib::make_shared<ConnectionMetadata>(new_id,
+                                                                                                     con_plain->get_handle(),
+                                                                                                     url,
+                                                                                                     false);
+
+            m_connection_list[new_id] = metadata_ptr;
+
+            con_plain->set_open_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_open<client_plain>,
+                    metadata_ptr,
+                    &m_endpoint_plain,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con_plain->set_fail_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_fail<client_plain>,
+                    metadata_ptr,
+                    &m_endpoint_plain,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con_plain->set_close_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_close<client_plain>,
+                    metadata_ptr,
+                    &m_endpoint_plain,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con_plain->set_message_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_message<client_plain>,
+                    metadata_ptr,
+                    websocketpp::lib::placeholders::_1,
+                    websocketpp::lib::placeholders::_2
+            ));
+
+            m_endpoint_plain.connect(con_plain);
+
+        } else {
+            client_tls::connection_ptr con = m_endpoint_tls.get_connection(url, ec);
+
+            if (ec) {
+                std::cerr << "> Connection initialization error: " << ec.message() << std::endl;
+                return -1;
+            }
+
+            new_id = m_next_id++;
+            ConnectionMetadata::ptr metadata_ptr = websocketpp::lib::make_shared<ConnectionMetadata>(new_id,
+                                                                                                     con->get_handle(),
+                                                                                                     url,
+                                                                                                     true);
+
+            m_connection_list[new_id] = metadata_ptr;
+
+            con->set_open_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_open<client_tls>,
+                    metadata_ptr,
+                    &m_endpoint_tls,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con->set_fail_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_fail<client_tls>,
+                    metadata_ptr,
+                    &m_endpoint_tls,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con->set_close_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_close<client_tls>,
+                    metadata_ptr,
+                    &m_endpoint_tls,
+                    websocketpp::lib::placeholders::_1
+            ));
+            con->set_message_handler(websocketpp::lib::bind(
+                    &ConnectionMetadata::on_message<client_tls>,
+                    metadata_ptr,
+                    websocketpp::lib::placeholders::_1,
+                    websocketpp::lib::placeholders::_2
+            ));
+
+            m_endpoint_tls.connect(con);
+        }
 
         return new_id;
     }
@@ -80,32 +161,39 @@ namespace dynastat {
             return;
         }
 
-        m_endpoint.close(metadata_it->second->get_hdl(), code, reason, ec);
+        if (metadata_it->second->get_secure()) {
+            m_endpoint_tls.close(metadata_it->second->get_hdl(), code, reason, ec);
+        } else {
+            m_endpoint_plain.close(metadata_it->second->get_hdl(), code, reason, ec);
+        }
         if (ec) {
             std::cerr << "> Error initiating close: " << ec.message() << std::endl;
         }
     }
 
-    void ConnectionMetadata::on_open(ssl_client *c, websocketpp::connection_hdl hdl) {
+    template<typename ClientType>
+    void ConnectionMetadata::on_open(ClientType *c, websocketpp::connection_hdl hdl) {
         m_status = OPEN;
 
-        ssl_client::connection_ptr con = c->get_con_from_hdl(hdl);
+        typename ClientType::connection_ptr con = c->get_con_from_hdl(hdl);
         m_server = con->get_response_header("Server");
     }
 
-    void ConnectionMetadata::on_fail(ssl_client *c, websocketpp::connection_hdl hdl) {
+    template<typename ClientType>
+    void ConnectionMetadata::on_fail(ClientType *c, websocketpp::connection_hdl hdl) {
         m_status = FAILED;
 
-        ssl_client::connection_ptr con = c->get_con_from_hdl(hdl);
+        typename ClientType::connection_ptr con = c->get_con_from_hdl(hdl);
         m_server = con->get_response_header("Server");
         m_error_reason = con->get_ec().message();
         std::cerr << "> Failed: " << m_error_reason << std::endl;
     }
 
-    void ConnectionMetadata::on_close(ssl_client *c, websocketpp::connection_hdl hdl) {
+    template<typename ClientType>
+    void ConnectionMetadata::on_close(ClientType *c, websocketpp::connection_hdl hdl) {
         m_status = CLOSED;
 
-        ssl_client::connection_ptr con = c->get_con_from_hdl(hdl);
+        typename ClientType::connection_ptr con = c->get_con_from_hdl(hdl);
         std::stringstream s;
         s << "close code: " << con->get_remote_close_code() << " ("
         << websocketpp::close::status::get_string(con->get_remote_close_code())
@@ -114,8 +202,8 @@ namespace dynastat {
         std::cerr << m_error_reason;
     }
 
-    void ConnectionMetadata::on_message(websocketpp::connection_hdl hdl,
-                                        std::shared_ptr<websocketpp::message_buffer::message<websocketpp::message_buffer::alloc::con_msg_manager>> msg) {
+    template<typename ClientType>
+    void ConnectionMetadata::on_message(websocketpp::connection_hdl hdl, typename ClientType::message_ptr msg) {
         std::stringstream s;
 
         if (msg->get_opcode() == websocketpp::frame::opcode::text) {
@@ -159,7 +247,11 @@ namespace dynastat {
             return;
         }
 
-        m_endpoint.send(metadata_it->second->get_hdl(), message, websocketpp::frame::opcode::text, ec);
+        if (metadata_it->second->get_secure()) {
+            m_endpoint_tls.send(metadata_it->second->get_hdl(), message, websocketpp::frame::opcode::text, ec);
+        } else {
+            m_endpoint_plain.send(metadata_it->second->get_hdl(), message, websocketpp::frame::opcode::text, ec);
+        }
         if (ec) {
             std::cout << "> Error sending message: " << ec.message() << std::endl;
             return;
@@ -188,5 +280,13 @@ namespace dynastat {
         }
 
         metadata_it->second->add_listener(listener);
+    }
+
+    int ConnectionMetadata::get_id() {
+        return m_id;
+    }
+
+    bool ConnectionMetadata::get_secure() {
+        return m_secure;
     }
 };
