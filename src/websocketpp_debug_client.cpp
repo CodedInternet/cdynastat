@@ -160,6 +160,7 @@ public:
     }
 
     ~websocket_endpoint() {
+        m_endpoint_plain.stop_perpetual();
         m_endpoint_tls.stop_perpetual();
 
         for (con_list::const_iterator it = m_connection_list.begin(); it != m_connection_list.end(); ++it) {
@@ -182,6 +183,7 @@ public:
             }
         }
 
+        m_thread_plain->join();
         m_thread_tls->join();
     }
 
