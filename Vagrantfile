@@ -70,9 +70,9 @@ Vagrant.configure(2) do |config|
   #   sudo apt-get install -y apache2
   # SHELL
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-add-repository ppa:ubuntu-toolchain-r-test
-    sudo apt-add-repository ppa:boost-latest
-    sudo apt-add-repository multiverse
+    sudo apt-add-repository -y ppa:ubuntu-toolchain-r
+    sudo apt-add-repository -y ppa:boost-latest
+    sudo apt-add-repository -y multiverse
     sudo apt-get update
     sudo apt-get install -y git build-essential pkg-config
 
