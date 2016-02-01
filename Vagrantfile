@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/precise64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -39,8 +39,6 @@ Vagrant.configure(2) do |config|
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
 
-  config.vm.synced_folder "/Volumes/Data/Users/ghost/Library/webrtc", "/opt/webrtc"
-
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
@@ -52,7 +50,6 @@ Vagrant.configure(2) do |config|
     vb.memory = 8192
     vb.cpus = 6
 
-    vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/vagrant", "1"]
   end
   #
   # View the documentation for the provider you are using for more
@@ -73,17 +70,12 @@ Vagrant.configure(2) do |config|
   #   sudo apt-get install -y apache2
   # SHELL
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-add-repository multiverse && sudo apt-get update
+    sudo apt-add-repository ppa:ubuntu-toolchain-r-test
+    sudo apt-add-repository ppa:boost-latest
+    sudo apt-add-repository multiverse
+    sudo apt-get update
     sudo apt-get install -y git build-essential pkg-config
-    sudo apt-get install -y git openjdk-7-jdk openjdk-7-jre-lib gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libgtk2.0-dev
-    cd /usr/local/
-    if [ ! -d /usr/local/depot_tools ]
-    then
-      sudo git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-    else
-      cd depot_tools
-      sudo git pull
-    fi
-    grep -q -F 'depot_tools' /home/vagrant/.profile || echo 'export PATH=/usr/local/depot_tools:"$PATH"' >> /home/vagrant/.profile
+
+    sudo apt-get install -y libboost1.55-all-dev g++-4.9 g++-4.9-multilib libx11-dev xorg-dev libnss3-dev libasound2-dev libpulse-dev libjpeg62-dev libxv-dev libgtk2.0-dev libexpat1-dev
   SHELL
 end
