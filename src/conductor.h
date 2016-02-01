@@ -14,74 +14,79 @@
 #include "talk/app/webrtc/peerconnection.h"
 #include "AbstractDynastat.h"
 
-// Names used for a IceCandidate JSON object.
-const char kCandidateSdpMidName[] = "sdpMid";
-const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
-const char kCandidateSdpName[] = "candidate";
+namespace cdynastat {
+    // Names used for a IceCandidate JSON object.
+    const char kCandidateSdpMidName[] = "sdpMid";
+    const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
+    const char kCandidateSdpName[] = "candidate";
 
 // Names used for a SessionDescription JSON object.
-const char kSessionDescriptionTypeName[] = "type";
-const char kSessionDescriptionSdpName[] = "sdp";
+    const char kSessionDescriptionTypeName[] = "type";
+    const char kSessionDescriptionSdpName[] = "sdp";
 
-class DummySetSessionDescriptionObserver
-    : public webrtc::SetSessionDescriptionObserver {
- public:
-  static DummySetSessionDescriptionObserver *Create() {
-    return
-        new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
-  }
-  virtual void OnSuccess() {
-    std::cout << "Set Description Success" << std::endl;
-    LOG(INFO) << __FUNCTION__;
-  }
-  virtual void OnFailure(const std::string &error) {
-    std::cerr << "Set description error: " << error << std::endl;
-    LOG(INFO) << __FUNCTION__ << " " << error;
-  }
+    class DummySetSessionDescriptionObserver
+            : public webrtc::SetSessionDescriptionObserver {
+    public:
+        static DummySetSessionDescriptionObserver *Create() {
+            return
+                    new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
+        }
 
- protected:
-  DummySetSessionDescriptionObserver() { }
-  ~DummySetSessionDescriptionObserver() { }
-};
+        virtual void OnSuccess() {
+            std::cout << "Set Description Success" << std::endl;
+            LOG(INFO) << __FUNCTION__;
+        }
 
-class Conductor
-    : public webrtc::PeerConnectionObserver,
-      public webrtc::CreateSessionDescriptionObserver,
-      public webrtc::DataChannelObserver,
-      public webrtc::IceObserver {
- public:
-  rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
-  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
-  rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
-  dynastat::AbstractDynastat* device;
+        virtual void OnFailure(const std::string &error) {
+            std::cerr << "Set description error: " << error << std::endl;
+            LOG(INFO) << __FUNCTION__ << " " << error;
+        }
 
-  virtual void OnStateChange() override;
+    protected:
+        DummySetSessionDescriptionObserver() { }
 
-  virtual void OnMessage(const webrtc::DataBuffer &buffer) override;
+        ~DummySetSessionDescriptionObserver() { }
+    };
 
-  virtual void OnRenegotiationNeeded() override;
+    class Conductor
+            : public webrtc::PeerConnectionObserver,
+              public webrtc::CreateSessionDescriptionObserver,
+              public webrtc::DataChannelObserver,
+              public webrtc::IceObserver {
+    public:
+        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
+        rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
+        rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
+        dynastat::AbstractDynastat *device;
 
-  virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc) override;
+        virtual void OnStateChange() override;
 
-  virtual void OnFailure(const std::string &error) override;
+        virtual void OnMessage(const webrtc::DataBuffer &buffer) override;
 
-  Conductor(std::string offer, dynastat::AbstractDynastat *device);
+        virtual void OnRenegotiationNeeded() override;
 
-  virtual int AddRef() const override;
+        virtual void OnSuccess(webrtc::SessionDescriptionInterface *desc) override;
 
-  virtual int Release() const override;
+        virtual void OnFailure(const std::string &error) override;
 
-  virtual void OnAddStream(webrtc::MediaStreamInterface *stream) override;
+        Conductor(std::string offer, dynastat::AbstractDynastat *device);
 
-  virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream) override;
+        virtual int AddRef() const override;
 
-  virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel) override;
+        virtual int Release() const override;
 
-  virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate) override;
+        virtual void OnAddStream(webrtc::MediaStreamInterface *stream) override;
 
-  virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
+        virtual void OnRemoveStream(webrtc::MediaStreamInterface *stream) override;
 
-  void count();
-};
+        virtual void OnDataChannel(webrtc::DataChannelInterface *data_channel) override;
+
+        virtual void OnIceCandidate(const webrtc::IceCandidateInterface *candidate) override;
+
+        virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
+
+        void count();
+    };
+}
 
 #endif //CDYNASTAT_CONDUCTOR_H

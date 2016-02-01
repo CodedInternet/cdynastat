@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
   server.uri = "stun:stun.l.google.com:19302";
   servers.push_back(server);
 
-  Conductor conductor(offer, device);
+  cdynastat::Conductor conductor(offer, device);
 
   thread->Start();
 
