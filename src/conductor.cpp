@@ -8,7 +8,7 @@
 #include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
 
-namespace cdynastat {
+namespace dynastat {
     void Conductor::count() {
         Json::Value json;
         json["sensors"];

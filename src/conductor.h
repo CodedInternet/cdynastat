@@ -14,7 +14,7 @@
 #include "talk/app/webrtc/peerconnection.h"
 #include "AbstractDynastat.h"
 
-namespace cdynastat {
+namespace dynastat {
     // Names used for a IceCandidate JSON object.
     const char kCandidateSdpMidName[] = "sdpMid";
     const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
