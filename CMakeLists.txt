@@ -73,10 +73,7 @@ download_project(PROJ websocketpp
 add_subdirectory(${websocketpp_SOURCE_DIR} ${websocketpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 include_directories(${websocketpp_SOURCE_DIR})
 
-SET(WEBRTC_NAMES libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
-
-# Define shared libraries
-set(SHARED_LIBS ${WEBRTC_NAMES})
+LINK_LIBRARIES(libwebrtc-${CMAKE_SYSTEM_NAME}-${ARCH}-r49.a)
 
 # gtest DownloadProject
 download_project(PROJ googletest

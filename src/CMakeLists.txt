@@ -9,7 +9,7 @@ add_library(WebRTCConductor conductor.cpp conductor.h)
 
 set(SOURCE_FILES Dynastat.cpp)
 add_executable(cdynastat main.cpp)
-target_link_libraries(cdynastat ${SHARED_LIBS} DynastatSimulator PeerConnectionClient WebRTCConductor)
+target_link_libraries(cdynastat DynastatSimulator PeerConnectionClient WebRTCConductor)
 
 add_executable(websocketpp_debug_client websocketpp_debug_client.cpp)
 target_link_libraries(websocketpp_debug_client)
