@@ -1,6 +1,10 @@
 {
   "version": 1,
 
+  "signaling_servers": [
+    "ws://127.0.0.1:8000/ws/device/test/"
+  ],
+
   "motors": {
     "left_foot_size": {
       "address": 5,

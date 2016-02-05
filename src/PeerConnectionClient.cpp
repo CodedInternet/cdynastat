@@ -177,6 +177,7 @@ namespace dynastat {
 
         typename ClientType::connection_ptr con = c->get_con_from_hdl(hdl);
         m_server = con->get_response_header("Server");
+        std::cout << "Connection opened to: " << m_server << std::endl;
     }
 
     template<typename ClientType>
@@ -213,7 +214,7 @@ namespace dynastat {
         }
 
         for (int i = 0; i < message_listeners.size(); i++) {
-            message_listeners[i]->on_message(s.str());
+            message_listeners[i]->on_message(m_id, s.str());
         }
     }
 

@@ -5,11 +5,12 @@
 #include <gtest/gtest.h>
 #include "PeerConnectionClient.h"
 #include <gmock/gmock.h>
+
+using testing::_;
 namespace dynastat {
     class MockPeerConnectionListener : public PeerConnectionListener {
     public:
-        MOCK_METHOD1(on_message, void(std::string
-                msg));
+        MOCK_METHOD2(on_message, void(int, std::string));
     };
 
     TEST(PeerConnectionClientTest, TLSEchoTest) {
@@ -20,7 +21,7 @@ namespace dynastat {
 
         peerConnectionClient->add_listener(0, &mockPeerConnectionListener);
 
-        EXPECT_CALL(mockPeerConnectionListener, on_message(testing::_));
+        EXPECT_CALL(mockPeerConnectionListener, on_message(_, _));
 
         // Allow 5 seconds for connection to open.
         // This could be done via signaling, but as normally we are only waiting for incomming messages, we there is no point
@@ -47,7 +48,7 @@ namespace dynastat {
 
         peerConnectionClient->add_listener(0, &mockPeerConnectionListener);
 
-        EXPECT_CALL(mockPeerConnectionListener, on_message(testing::_));
+        EXPECT_CALL(mockPeerConnectionListener, on_message(_, _));
 
         // Allow 5 seconds for connection to open.
         // This could be done via signaling, but as normally we are only waiting for incomming messages, we there is no point

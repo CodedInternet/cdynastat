@@ -46,10 +46,12 @@ namespace dynastat {
 
     }
 
-    Conductor::Conductor(std::string offer, dynastat::AbstractDynastat *device) {
+    Conductor::Conductor(std::shared_ptr<dynastat::AbstractDynastat> device,
+                             std::shared_ptr<PeerConnectionClient> connectionClient) {
         this->device = device;
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
-
+        this->connectionClient = connectionClient;
+        this->connectionClientId = connectionClientId;
 
         webrtc::PeerConnectionInterface::RTCConfiguration config;
         webrtc::PeerConnectionInterface::IceServer server;
@@ -77,27 +79,29 @@ namespace dynastat {
             std::cerr << "Failed to create peerConnection";
             return;
         }
+    }
 
+    void Conductor::GenerateAnswer(std::string &offer) {
         Json::Reader reader;
         Json::Value jmessage;
         if (!reader.parse(offer, jmessage)) {
-            std::cerr << "Received unknown message. " << offer;
+            std::__1::cerr << "Received unknown message. " << offer;
             return;
         }
-        std::string type, sdp;
+        std::__1::string type, sdp;
         rtc::GetStringFromJsonObject(jmessage, "type", &type);
         if (type != "offer") {
-            std::cerr << "Not an offer";
+            std::__1::cerr << "Not an offer";
             return;
         }
 
         rtc::GetStringFromJsonObject(jmessage, "sdp", &sdp);
-        std::cout << "Using sdp: " << sdp;
+        std::__1::cout << "Using sdp: " << sdp;
 
         webrtc::SdpParseError error;
-        webrtc::SessionDescriptionInterface *sessionDescription(webrtc::CreateSessionDescription(type, sdp, &error));
+        webrtc::SessionDescriptionInterface *sessionDescription(CreateSessionDescription(type, sdp, &error));
         if (!sessionDescription) {
-            std::cerr << "Can't parse received session description message. "
+            std::__1::cerr << "Can't parse received session description message. "
             << "SdpParseError was: " << error.description;
             return;
         }
@@ -159,7 +163,22 @@ namespace dynastat {
             answer["type"] = "answer";
             answer["sdp"] = sdp;
 
-            std::cout << writer.write(answer);
+            connectionClient->send(connectionClientId, writer.write(answer));
         }
+    }
+
+    void ConductorFactory::on_message(int con_id, std::string msg) {
+        webrtc::PeerConnectionInterface::IceServers servers;
+        webrtc::PeerConnectionInterface::IceServer server;
+        server.uri = "stun:stun.l.google.com:19302";
+        servers.push_back(server);
+
+        conductor->GenerateAnswer(msg);
+    }
+
+    ConductorFactory::ConductorFactory(std::shared_ptr<PeerConnectionClient> c,
+                                       std::shared_ptr<AbstractDynastat> device) : m_connectionClient(c),
+                                                                                   m_device(device) {
+        conductor = new Conductor(device, c);
     }
 };

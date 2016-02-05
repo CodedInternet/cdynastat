@@ -16,7 +16,7 @@ namespace dynastat {
 
     class PeerConnectionListener {
     public:
-        virtual void on_message(std::string msg) = 0;
+        virtual void on_message(int con_id, std::string msg) = 0;
     };
 
     class ConnectionMetadata {
