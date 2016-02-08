@@ -1,4 +1,5 @@
 var pc_config = {"iceServers": [{"url": "stun:stun.stunprotocol.prg"}]};
+var wsuri = "ws://127.0.0.1:8000/ws/device/test/";
 
 var pc = new webkitRTCPeerConnection(pc_config);
 
@@ -44,7 +45,7 @@ dc.onclose = function () {
 function getOffer() {
     pc.createOffer(function(desc) {
         pc.setLocalDescription(desc);
-        console.log(JSON.stringify(desc));
+        doSend(JSON.stringify(desc));
     })
 }
 
@@ -63,4 +64,17 @@ function gotSignal(signal) {
         });
     else
         pc.addIceCandidate(new RTCIceCandidate(signal));
+}
+
+function openRtc() {
+    websocket = new WebSocket(wsuri);
+    websocket.onopen = function(evt) {getOffer()};
+    websocket.onmessage = function(evt) {
+        console.log(evt.data);
+        gotSignal(JSON.parse(evt.data));
+    };
+}
+
+function doSend(message) {
+    websocket.send(message);
 }

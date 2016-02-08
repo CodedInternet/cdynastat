@@ -165,7 +165,7 @@ namespace dynastat {
             answer["type"] = "answer";
             answer["sdp"] = sdp;
 
-//            connectionClient->send(connectionClientId, writer.write(answer));
+            connectionClient->send(connectionClientId, writer.write(answer));
             std::cout << "Answer: " << writer.write(answer);
         }
     }
