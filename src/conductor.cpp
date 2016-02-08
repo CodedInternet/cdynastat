@@ -171,11 +171,6 @@ namespace dynastat {
     }
 
     void ConductorFactory::on_message(int con_id, std::string msg) {
-        webrtc::PeerConnectionInterface::IceServers servers;
-        webrtc::PeerConnectionInterface::IceServer server;
-        server.uri = "stun:stun.l.google.com:19302";
-        servers.push_back(server);
-
         conductor->GenerateAnswer(msg);
     }
 

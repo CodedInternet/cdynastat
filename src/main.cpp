@@ -43,23 +43,9 @@ int main(int argc, char *argv[]) {
         connectionClient->add_listener(id, conductorFactory);
     }
 
-
-    std::cout << "Please paste session description:";
-
-    std::string offer;
-    getline(std::cin, offer);
-
     rtc::AutoThread autoThread;
     rtc::Thread *thread = rtc::Thread::Current();
-
-    webrtc::PeerConnectionInterface::IceServers servers;
-    webrtc::PeerConnectionInterface::IceServer server;
-    server.uri = "stun:stun.l.google.com:19302";
-    servers.push_back(server);
-
-    dynastat::Conductor conductor(device, nullptr);
-
-    thread->Start();
+    thread->Run();
 
     std::cout << "Exiting";
 
