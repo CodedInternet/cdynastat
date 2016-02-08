@@ -1,4 +1,4 @@
-var pc_config = {"iceServers": [{"url": "stun:23.21.150.121"}]};
+var pc_config = {"iceServers": [{"url": "stun:stun.stunprotocol.prg"}]};
 
 var pc = new webkitRTCPeerConnection(pc_config);
 

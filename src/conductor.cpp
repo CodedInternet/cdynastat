@@ -5,6 +5,8 @@
 #include "conductor.h"
 
 #include <boost/thread.hpp>
+#include <json/reader.h>
+#include <json/writer.h>
 #include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
 
@@ -55,7 +57,7 @@ namespace dynastat {
 
         webrtc::PeerConnectionInterface::RTCConfiguration config;
         webrtc::PeerConnectionInterface::IceServer server;
-        server.uri = "stun:stun.l.google.com:19302";
+        server.uri = "stun:stun.stunprotocol.prg";
         config.servers.push_back(server);
 
         bool dtls = true;
@@ -124,7 +126,7 @@ namespace dynastat {
 //    answer["type"] = "answer";
 //    answer["sdp"] = sdp;
 //
-//    std::cout << "Answer: " << answer;
+//
     }
 
     void Conductor::OnRenegotiationNeeded() {
@@ -146,7 +148,7 @@ namespace dynastat {
             return;
         }
 
-        std::cout << "Recieved message: " << jmessage["message"] << std::endl;
+        std::cout << "Recieved message: " << jmessage["message"].asString() << std::endl;
 
         // Simple test to check if we can send through the DC as well.
         dataChannel->Send(buffer);
@@ -163,7 +165,8 @@ namespace dynastat {
             answer["type"] = "answer";
             answer["sdp"] = sdp;
 
-            connectionClient->send(connectionClientId, writer.write(answer));
+//            connectionClient->send(connectionClientId, writer.write(answer));
+            std::cout << "Answer: " << writer.write(answer);
         }
     }
 
