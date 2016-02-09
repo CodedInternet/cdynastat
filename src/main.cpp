@@ -43,9 +43,14 @@ int main(int argc, char *argv[]) {
         connectionClient->add_listener(id, conductorFactory);
     }
 
-    rtc::AutoThread autoThread;
-    rtc::Thread *thread = rtc::Thread::Current();
-    thread->Run();
+    bool running = true;
+    std::string input;
+    while(running) {
+        if (input == "quit" || input == "q" || input == "exit") {
+            running = false;
+            break;
+        }
+    }
 
     std::cout << "Exiting";
 
