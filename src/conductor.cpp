@@ -87,23 +87,23 @@ namespace dynastat {
         Json::Reader reader;
         Json::Value jmessage;
         if (!reader.parse(offer, jmessage)) {
-            std::__1::cerr << "Received unknown message. " << offer;
+            std::cerr << "Received unknown message. " << offer;
             return;
         }
-        std::__1::string type, sdp;
+        std::string type, sdp;
         rtc::GetStringFromJsonObject(jmessage, "type", &type);
         if (type != "offer") {
-            std::__1::cerr << "Not an offer";
+            std::cerr << "Not an offer";
             return;
         }
 
         rtc::GetStringFromJsonObject(jmessage, "sdp", &sdp);
-        std::__1::cout << "Using sdp: " << sdp;
+        std::cout << "Using sdp: " << sdp;
 
         webrtc::SdpParseError error;
         webrtc::SessionDescriptionInterface *sessionDescription(CreateSessionDescription(type, sdp, &error));
         if (!sessionDescription) {
-            std::__1::cerr << "Can't parse received session description message. "
+            std::cerr << "Can't parse received session description message. "
             << "SdpParseError was: " << error.description;
             return;
         }
