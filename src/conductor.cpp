@@ -49,8 +49,9 @@ namespace dynastat {
     }
 
     Conductor::Conductor(std::shared_ptr<dynastat::AbstractDynastat> device,
-                             std::shared_ptr<PeerConnectionClient> connectionClient) {
+                         std::shared_ptr<PeerConnectionClient> connectionClient) {
         this->device = device;
+
         peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
         this->connectionClient = connectionClient;
         this->connectionClientId = connectionClientId;
@@ -177,6 +178,11 @@ namespace dynastat {
     ConductorFactory::ConductorFactory(std::shared_ptr<PeerConnectionClient> c,
                                        std::shared_ptr<AbstractDynastat> device) : m_connectionClient(c),
                                                                                    m_device(device) {
-        conductor = new Conductor(device, c);
+
+    }
+
+    void ConductorFactory::Run(rtc::Thread *thread) {
+        conductor = new Conductor(m_device, m_connectionClient);
+        thread->Run();
     }
 };

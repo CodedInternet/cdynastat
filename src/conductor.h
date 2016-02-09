@@ -66,7 +66,7 @@ namespace dynastat {
         virtual void OnFailure(const std::string &error) override;
 
         Conductor(std::shared_ptr<dynastat::AbstractDynastat> device,
-                          std::shared_ptr<PeerConnectionClient> connectionClient);
+                  std::shared_ptr<PeerConnectionClient> connectionClient);
 
         virtual int AddRef() const override;
 
@@ -96,8 +96,11 @@ namespace dynastat {
 
     };
 
-    class ConductorFactory : public PeerConnectionListener {
+    class ConductorFactory : public PeerConnectionListener,
+                             public rtc::Runnable {
     public:
+        virtual void Run(rtc::Thread *thread) override;
+
         ConductorFactory(std::shared_ptr<PeerConnectionClient> c, std::shared_ptr<AbstractDynastat> device);
 
         ~ConductorFactory() { };
@@ -109,6 +112,7 @@ namespace dynastat {
         std::shared_ptr<PeerConnectionClient> m_connectionClient;
         std::shared_ptr<AbstractDynastat> m_device;
         Conductor *conductor;
+        std::vector<Conductor *> m_conductor;
     };
 }
 
