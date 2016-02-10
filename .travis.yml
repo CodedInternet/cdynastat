@@ -31,4 +31,5 @@ install:
 script:
   - cmake . -DARCH=$ARCH -DCMAKE_CXX_COMPILER=$CMAKE_CXX -DCMAKE_C_COMPILER=$CMAKE_CC
   - make
+  - make test
 
