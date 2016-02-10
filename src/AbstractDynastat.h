@@ -12,9 +12,6 @@
 #include <json/value.h>
 
 namespace dynastat {
-    class ValueError : public std::exception {
-
-    };
 
     class AbstractSensor {
     public:
@@ -22,15 +19,22 @@ namespace dynastat {
 
         virtual ~AbstractSensor() { };
 
-        virtual int readValue() = 0;
+        virtual unsigned short scaleValue(int val);
 
-        virtual int scaleValue(int val);
+        virtual unsigned int getValue(int row, int col) = 0;
+
+        virtual Json::Value readAll();
 
     protected:
-        virtual void setScale(int zeroValue, int halfValue, int fullValue);
+        virtual void setScale(unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue);
 
-        const int bits = 8;
-        int zeroValue;
+        virtual int getOffset(unsigned short row, unsigned short col);
+
+        const uint8_t bits = 8;
+        unsigned short address;
+        unsigned short rows;
+        unsigned short cols;
+        unsigned short zeroValue;
         double scale;
     };
 
@@ -57,13 +61,14 @@ namespace dynastat {
         virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
     };
 
+    typedef std::map<std::string, AbstractSensor *> SensorMap;
+    typedef std::map<std::string, AbstractMotor *> MotorMap;
+
     class AbstractDynastat {
     public:
         AbstractDynastat() { };
 
         virtual ~AbstractDynastat();
-
-        virtual int readSensor(std::string name, int id);
 
         virtual Json::Value readSensors();
 
@@ -80,8 +85,8 @@ namespace dynastat {
         const char *kConfBaseAddress = "base_address";
 
     protected:
-        std::map<std::string, AbstractMotor *> motors;
-        std::map<std::string, std::map<int, AbstractSensor *> *> sensors;
+        MotorMap motors;
+        SensorMap sensors;
     };
 }
 

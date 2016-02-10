@@ -24,6 +24,11 @@ class TestAbstractSensor: AbstractSensor {
   void doSetScale(int zeroValue, int halfValue, int fullValue) {
     return setScale(zeroValue, halfValue, fullValue);
   }
+
+private:
+    virtual unsigned int getValue(int row, int col) override {
+      return 0;
+    };
 };
 
 int TestAbstractSensor::readValue() {

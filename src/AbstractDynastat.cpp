@@ -1,6 +1,7 @@
 #include <string>
 #include <cmath>
 #include <json/value.h>
+#include <assert.h>
 
 #include "AbstractDynastat.h"
 
@@ -9,12 +10,6 @@ namespace dynastat {
 int AbstractDynastat::readMotor(std::string name) {
   AbstractMotor *motor = motors.at(name);
   return motor->getPosition();
-}
-
-int AbstractDynastat::readSensor(std::string name, int id) {
-  std::map<int, AbstractSensor *> *pad = sensors.at(name);
-  AbstractSensor *sensor = pad->at(id);
-  return sensor->readValue();
 }
 
 void AbstractDynastat::setMotor(std::string name, int pos) {
@@ -59,19 +54,14 @@ AbstractDynastat::~AbstractDynastat() {
     motors.erase(it->first);
   }
 
-  for (std::map<std::string, std::map<int, AbstractSensor *> *>::iterator it1 = sensors.begin(); it1 != sensors.end();
+  for (std::map<std::string, AbstractSensor *>::iterator it1 = sensors.begin(); it1 != sensors.end();
        ++it1) {
-    std::map<int, AbstractSensor *> *pad = it1->second;
-    for (std::map<int, AbstractSensor *>::iterator it2 = pad->begin(); it2 != pad->end(); it2++) {
-      delete it2->second;
-      pad->erase(it2->first);
-    }
     delete it1->second;
     sensors.erase(it1->first);
   }
 }
 
-void AbstractSensor::setScale(int zeroValue, int halfValue, int fullValue) {
+    void AbstractSensor::setScale(unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue) {
   this->zeroValue = zeroValue;
 
   double max = (pow(2, bits) - 1);
@@ -81,7 +71,7 @@ void AbstractSensor::setScale(int zeroValue, int halfValue, int fullValue) {
   scale = (m1 + m2) / 2;
 }
 
-int AbstractSensor::scaleValue(int val) {
+unsigned short AbstractSensor::scaleValue(int val) {
   int scaled;
   val -= zeroValue;
 
@@ -99,13 +89,29 @@ int AbstractSensor::scaleValue(int val) {
 }
 Json::Value AbstractDynastat::readSensors() {
   Json::Value result;
-  for (std::map<std::string, std::map<int, AbstractSensor *> *>::iterator it1 = sensors.begin(); it1 != sensors.end();
-       ++it1) {
-    std::map<int, AbstractSensor *> *pad = it1->second;
-    for (std::map<int, AbstractSensor *>::iterator it2 = pad->begin(); it2 != pad->end(); it2++) {
-      result[it1->first + std::to_string(it2->first)] = it2->second->readValue();
-    }
+  for (std::map<std::string, AbstractSensor *>::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
+    result[it1->first] = it1->second->readAll();
   }
   return result;
 }
+
+    Json::Value AbstractSensor::readAll() {
+        Json::Value result;
+        for (unsigned short row = 0; row < rows; ++row) {
+            result[row] = Json::Value(Json::arrayValue);
+            for (unsigned short col = 0; col < cols; ++col) {
+                result[row][col] = Json::Value();
+                result[row][col] = getValue(row, col);
+            }
+        }
+        return result;
+    }
+
+    int AbstractSensor::getOffset(unsigned short row, unsigned short col) {
+        // less buffer overflows
+        assert(row < rows);
+        assert(col < cols);
+
+        return col * rows + row;
+    }
 }

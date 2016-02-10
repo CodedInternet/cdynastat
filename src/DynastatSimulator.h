@@ -26,20 +26,21 @@ class SimulatedMotor: public AbstractMotor {
 
 class SimulatedSensor: public AbstractSensor {
  public:
-  virtual int readValue();
+    virtual unsigned int getValue(int row, int col) override;
 
   void updateValue();
 
-  SimulatedSensor(int zeroValue, int halfValue, int fullValue);
+    SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols, unsigned short zeroValue,
+                    unsigned short halfValue, unsigned short fullValue);
 
   ~SimulatedSensor();
 
  private:
   boost::thread *worker;
-  std::mutex lock;
-  int value;
+    std::mutex lock;
   bool running = true;
   const int change = 5;
+    uint16_t *buffer;
 };
 }
 
