@@ -15,7 +15,7 @@ namespace dynastat {
         Json::Value json;
         json["sensors"];
         while (true) {
-            json["sensors"] = device->readSensors();
+            json["sensors"] = m_device->readSensors();
             webrtc::DataBuffer buffer(json.toStyledString());
             dataChannel->Send(buffer);
             boost::this_thread::sleep(boost::posix_time::milliseconds(1));
@@ -49,68 +49,15 @@ namespace dynastat {
     }
 
     Conductor::Conductor(std::shared_ptr<dynastat::AbstractDynastat> device,
-                         std::shared_ptr<PeerConnectionClient> connectionClient) {
-        this->device = device;
+                         std::shared_ptr<PeerConnectionClient> connectionClient,
+                         int connectionClientId) : m_device(device),
+                                                   m_connectionClient(connectionClient),
+                                                   m_connectionClientId(connectionClientId) {
 
-        peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
-        this->connectionClient = connectionClient;
-        this->connectionClientId = connectionClientId;
-
-        webrtc::PeerConnectionInterface::RTCConfiguration config;
-        webrtc::PeerConnectionInterface::IceServer server;
-        server.uri = "stun:stun.stunprotocol.prg";
-        config.servers.push_back(server);
-
-        bool dtls = true;
-        webrtc::FakeConstraints constraints;
-        if (dtls) {
-            constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
-                                    "true");
-            constraints.SetAllowDtlsSctpDataChannels();
-        } else {
-            constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
-                                    "false");
-        }
-
-        peerConnection = peerConnectionFactory->CreatePeerConnection(config,
-                                                                     &constraints,
-                                                                     NULL,
-                                                                     NULL,
-                                                                     this);
-
-        if (!peerConnection.get()) {
-            std::cerr << "Failed to create peerConnection";
-            return;
-        }
     }
 
     void Conductor::GenerateAnswer(std::string &offer) {
-        Json::Reader reader;
-        Json::Value jmessage;
-        if (!reader.parse(offer, jmessage)) {
-            std::cerr << "Received unknown message. " << offer;
-            return;
-        }
-        std::string type, sdp;
-        rtc::GetStringFromJsonObject(jmessage, "type", &type);
-        if (type != "offer") {
-            std::cerr << "Not an offer";
-            return;
-        }
 
-        rtc::GetStringFromJsonObject(jmessage, "sdp", &sdp);
-        std::cout << "Using sdp: " << sdp;
-
-        webrtc::SdpParseError error;
-        webrtc::SessionDescriptionInterface *sessionDescription(CreateSessionDescription(type, sdp, &error));
-        if (!sessionDescription) {
-            std::cerr << "Can't parse received session description message. "
-            << "SdpParseError was: " << error.description;
-            return;
-        }
-        peerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-
-        peerConnection->CreateAnswer(this, NULL);
     }
 
     void Conductor::OnFailure(const std::string &error) {
@@ -118,7 +65,7 @@ namespace dynastat {
     }
 
     void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
-        peerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), desc);
+        m_peerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), desc);
 
 //    std::string sdp;
 //    desc->ToString(&sdp);
@@ -156,8 +103,8 @@ namespace dynastat {
     }
 
     void Conductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
-        if (new_state == peerConnection->kIceGatheringComplete) {
-            const webrtc::SessionDescriptionInterface *desc = peerConnection->local_description();
+        if (new_state == m_peerConnection->kIceGatheringComplete) {
+            const webrtc::SessionDescriptionInterface *desc = m_peerConnection->local_description();
             std::string sdp;
             desc->ToString(&sdp);
 
@@ -166,13 +113,22 @@ namespace dynastat {
             answer["type"] = "answer";
             answer["sdp"] = sdp;
 
-            connectionClient->send(connectionClientId, writer.write(answer));
+            m_connectionClient->send(m_connectionClientId, writer.write(answer));
             std::cout << "Answer: " << writer.write(answer);
         }
     }
 
     void ConductorFactory::on_message(int con_id, std::string msg) {
-        conductor->GenerateAnswer(msg);
+        Json::Reader reader;
+        Json::Value jmessage;
+        if (!reader.parse(msg, jmessage)) {
+            std::cerr << "Received unknown message. " << msg;
+            return;
+        }
+
+        if (jmessage.get("type", 0) == webrtc::SessionDescriptionInterface::kOffer) {
+            OnOffer(jmessage, con_id);
+        }
     }
 
     ConductorFactory::ConductorFactory(std::shared_ptr<PeerConnectionClient> c,
@@ -182,7 +138,54 @@ namespace dynastat {
     }
 
     void ConductorFactory::Run(rtc::Thread *thread) {
-        conductor = new Conductor(m_device, m_connectionClient);
+        // This needs to be done once we are in the specific thread as it runs on Thread::Current()
+        m_peerConnectionFactory = webrtc::CreatePeerConnectionFactory();
         thread->Run();
+    }
+
+    void ConductorFactory::OnOffer(Json::Value offer, int con_id) {
+        webrtc::SdpParseError error;
+        webrtc::SessionDescriptionInterface *sessionDescription(
+                CreateSessionDescription(webrtc::SessionDescriptionInterface::kOffer, offer.get("sdp", 0).asString(),
+                                         &error));
+        if (!sessionDescription) {
+            std::cerr << "Can't parse received session description message. "
+            << "SdpParseError was: " << error.description;
+            return;
+        }
+
+        webrtc::PeerConnectionInterface::RTCConfiguration config;
+        webrtc::PeerConnectionInterface::IceServer server;
+        server.uri = "stun:stun.stunprotocol.prg";
+        config.servers.push_back(server);
+
+        webrtc::FakeConstraints constraints;
+
+#if (DTLS)
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                                "true");
+        constraints.SetAllowDtlsSctpDataChannels();
+# else
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                                "false");
+#endif
+        Conductor *conductor = new Conductor(m_device, m_connectionClient, con_id);
+        m_conductors.push_back(conductor);
+        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection = m_peerConnectionFactory->CreatePeerConnection(
+                config,
+                &constraints,
+                NULL,
+                NULL,
+                conductor);
+        conductor->set_peerConnection(peerConnection);
+
+        if (!peerConnection.get()) {
+            std::cerr << "Failed to create peerConnection";
+            return;
+        }
+
+        peerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
+
+        peerConnection->CreateAnswer(conductor, NULL);
     }
 };

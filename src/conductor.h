@@ -5,6 +5,8 @@
 #ifndef CDYNASTAT_CONDUCTOR_H
 #define CDYNASTAT_CONDUCTOR_H
 
+#define DTLS true
+
 #include <iostream>
 #include <queue>
 #include "webrtc/base/thread.h"
@@ -48,6 +50,11 @@ namespace dynastat {
         ~DummySetSessionDescriptionObserver() { }
     };
 
+    /**
+     * The conductor is similar to Connection Metadata in that it stores all the information about the associated
+     * PeerConnectionInterface. The exception to this is that it also handels all the WebRTC callbacks and makes
+     * sure signals get passed around where appropriate.
+     */
     class Conductor
             : public webrtc::PeerConnectionObserver,
               public webrtc::CreateSessionDescriptionObserver,
@@ -65,8 +72,13 @@ namespace dynastat {
 
         virtual void OnFailure(const std::string &error) override;
 
+        void set_peerConnection(const rtc::scoped_refptr<webrtc::PeerConnectionInterface> &m_peerConnection) {
+            Conductor::m_peerConnection = m_peerConnection;
+        }
+
         Conductor(std::shared_ptr<dynastat::AbstractDynastat> device,
-                  std::shared_ptr<PeerConnectionClient> connectionClient);
+                  std::shared_ptr<PeerConnectionClient> connectionClient,
+                  int connectionClientId);
 
         virtual int AddRef() const override;
 
@@ -87,12 +99,13 @@ namespace dynastat {
         void GenerateAnswer(std::string &offer);
 
     private:
-        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
-        rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
+
+//        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
+        rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;
         rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
-        std::shared_ptr<dynastat::AbstractDynastat> device;
-        std::shared_ptr<PeerConnectionClient> connectionClient;
-        int connectionClientId;
+        std::shared_ptr<dynastat::AbstractDynastat> m_device;
+        std::shared_ptr<PeerConnectionClient> m_connectionClient;
+        int m_connectionClientId;
 
     };
 
@@ -108,11 +121,12 @@ namespace dynastat {
     private:
         virtual void on_message(int con_id, std::string msg);
 
-    private:
+        void OnOffer(Json::Value offer, int con_id);
+
         std::shared_ptr<PeerConnectionClient> m_connectionClient;
         std::shared_ptr<AbstractDynastat> m_device;
-        Conductor *conductor;
-        std::vector<Conductor *> m_conductor;
+        rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_peerConnectionFactory;
+        std::vector<Conductor *> m_conductors;
     };
 }
 
