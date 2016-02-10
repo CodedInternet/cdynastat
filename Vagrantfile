@@ -31,7 +31,7 @@ Vagrant.configure(2) do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  # config.vm.network "public_network"
+  config.vm.network "public_network"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -76,6 +76,6 @@ Vagrant.configure(2) do |config|
     sudo apt-get update
     sudo apt-get install -y git build-essential pkg-config
 
-    sudo apt-get install -y libboost1.55-all-dev g++-4.9 g++-4.9-multilib libx11-dev xorg-dev libnss3-dev libasound2-dev libpulse-dev libjpeg62-dev libxv-dev libgtk2.0-dev libexpat1-dev
+    sudo apt-get install -y cmake libboost1.55-all-dev g++-4.9 g++-4.9-multilib libx11-dev xorg-dev libnss3-dev libasound2-dev libpulse-dev libjpeg62-dev libxv-dev libgtk2.0-dev libexpat1-dev
   SHELL
 end
