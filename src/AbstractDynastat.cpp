@@ -78,7 +78,7 @@ unsigned short AbstractSensor::scaleValue(int val) {
   if (val < 0) {
     scaled = 0;
   } else {
-    scaled = (int) std::round(val * scale);
+    scaled = (int) std::round(val / scale);
 
     if (scaled > pow(2, bits) - 1) {
       scaled = (int) (pow(2, bits) - 1);

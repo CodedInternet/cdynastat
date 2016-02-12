@@ -58,10 +58,6 @@ namespace dynastat {
     }
 
     void SimulatedSensor::updateValue() {
-        typedef boost::random::mt19937 RNGType;
-        RNGType rng;
-        boost::uniform_int<> range(-change, change);
-        boost::variate_generator< RNGType, boost::uniform_int<> > diff(rng, range);
         while (running) {
 
             lock.lock();
@@ -70,14 +66,20 @@ namespace dynastat {
                 for (unsigned short col = 0; col < cols; col++) {
                     int offset = (col * rows) + row;
                     uint16_t value = buffer[offset];
-                    int change = diff();
-                    if((value + change) < 0) {
-                        value = 0;
-                    } else if ((value + change) > UINT16_MAX) {
-                        value = UINT16_MAX;
+
+                    if (rand() % 1000 == 0) {
+                        value = rand() % (uint16_t) -1;
                     } else {
-                        value += change;
+                        int change = rand() % (range * 2 + 1) - range;
+                        if ((value + change) < 0) {
+                            value = 0;
+                        } else if ((value + change) > UINT16_MAX) {
+                            value = UINT16_MAX;
+                        } else {
+                            value += change;
+                        }
                     }
+
                     buffer[offset] = value;
                 }
             }
