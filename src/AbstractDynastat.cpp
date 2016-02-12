@@ -88,8 +88,8 @@ unsigned short AbstractSensor::scaleValue(int val) {
   return scaled;
 }
 Json::Value AbstractDynastat::readSensors() {
-  Json::Value result;
-  for (std::map<std::string, AbstractSensor *>::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
+  Json::Value result = Json::objectValue;
+  for (SensorMap::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
     result[it1->first] = it1->second->readAll();
   }
   return result;

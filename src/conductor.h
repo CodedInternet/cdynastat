@@ -106,7 +106,7 @@ namespace dynastat {
         std::shared_ptr<dynastat::AbstractDynastat> m_device;
         std::shared_ptr<PeerConnectionClient> m_connectionClient;
         int m_connectionClientId;
-
+        bool running = true;
     };
 
     class ConductorFactory : public PeerConnectionListener,

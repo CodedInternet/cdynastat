@@ -12,7 +12,8 @@ namespace dynastat {
             case 1: {
                 const Json::Value sensorConfig = config[kConfSensors];
                 for (Json::ValueIterator itr = sensorConfig.begin(); itr != sensorConfig.end(); itr++) {
-                    const Json::Value conf = sensorConfig[itr.key().asString()];
+                    std::string name = itr.key().asString();
+                    const Json::Value conf = sensorConfig[name];
                     if (conf == false or !conf.get(kConfBaseAddress, 0).asInt()) {
                         continue;
                     }
@@ -26,9 +27,9 @@ namespace dynastat {
 
                     SimulatedSensor *sensor = new SimulatedSensor(baseAddress, rows, cols, zeroValue, halfValue, fullValue);
 
-                    sensors[itr.key().asString()] = sensor;
-                    break;
+                    sensors[name] = sensor;
                 }
+                break;
 
             }
         }
