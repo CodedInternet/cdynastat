@@ -30,7 +30,7 @@
       "cols": 16,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65536,
+      "full_value": 65535,
       "base_address": 16
     },
     "right_mtp": {
@@ -38,7 +38,7 @@
       "cols": 16,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65536,
+      "full_value": 65535,
       "base_address": 192
     }
   }
