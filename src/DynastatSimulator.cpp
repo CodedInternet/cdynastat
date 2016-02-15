@@ -67,7 +67,7 @@ namespace dynastat {
                     int offset = (col * rows) + row;
                     uint16_t value = buffer[offset];
 
-                    if (rand() % 1000 == 0) {
+                    if (rand() % 10000 == 0) {
                         value = rand() % (uint16_t) -1;
                     } else {
                         int change = rand() % (range * 2 + 1) - range;
@@ -86,7 +86,7 @@ namespace dynastat {
 
             lock.unlock();
 
-            boost::this_thread::sleep(boost::posix_time::milliseconds(5));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(2));
         }
     }
 

@@ -39,7 +39,7 @@ class SimulatedSensor: public AbstractSensor {
   boost::thread *worker;
     std::mutex lock;
   bool running = true;
-    const int range = 50;
+    const int range = 200;
     uint16_t *buffer;
 };
 }
