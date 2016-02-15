@@ -18,7 +18,7 @@ namespace dynastat {
             json["sensors"] = m_device->readSensors();
             webrtc::DataBuffer buffer(writer.write(json));
             dataChannel->Send(buffer);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
     }
 
