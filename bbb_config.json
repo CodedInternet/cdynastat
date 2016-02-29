@@ -33,9 +33,41 @@
       "full_value": 65535,
       "base_address": 16
     },
+    "left_hallux": {
+      "rows": 12,
+      "cols": 6,
+      "zero_value": 0,
+      "half_value": 32768,
+      "full_value": 65535,
+      "base_address": 16
+    },
+    "left_heel": {
+      "rows": 10,
+      "cols": 10,
+      "zero_value": 0,
+      "half_value": 32768,
+      "full_value": 65535,
+      "base_address": 16
+    },
     "right_mtp": {
       "rows": 10,
       "cols": 16,
+      "zero_value": 0,
+      "half_value": 32768,
+      "full_value": 65535,
+      "base_address": 192
+    },
+    "right_hallux": {
+      "rows": 12,
+      "cols": 6,
+      "zero_value": 0,
+      "half_value": 32768,
+      "full_value": 65535,
+      "base_address": 192
+    },
+    "right_heel": {
+      "rows": 10,
+      "cols": 10,
       "zero_value": 0,
       "half_value": 32768,
       "full_value": 65535,
