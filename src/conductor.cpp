@@ -13,12 +13,12 @@
 namespace dynastat {
     void Conductor::count() {
         Json::Value json;
-        json["sensors"];
-        while (true) {
+        Json::FastWriter writer;
+        while (running) {
             json["sensors"] = m_device->readSensors();
-            webrtc::DataBuffer buffer(json.toStyledString());
+            webrtc::DataBuffer buffer(writer.write(json));
             dataChannel->Send(buffer);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
         }
     }
 
@@ -82,7 +82,10 @@ namespace dynastat {
     }
 
     void Conductor::OnStateChange() {
-
+        switch (m_peerConnection->signaling_state()) {
+            case webrtc::PeerConnectionInterface::SignalingState::kClosed:
+                running = false;
+        }
     }
 
     void Conductor::OnMessage(const webrtc::DataBuffer &buffer) {
