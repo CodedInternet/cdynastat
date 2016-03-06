@@ -40,8 +40,12 @@ namespace dynastat {
 
     void Conductor::OnDataChannel(webrtc::DataChannelInterface *data_channel) {
         data_channel->RegisterObserver(this);
-        this->dataChannel = data_channel;
-        new boost::thread([=] { count(); });
+        std::string label = data_channel->label();
+
+        if (label == "data") {
+            this->dataChannel = data_channel;
+            new boost::thread([=] { count(); });
+        }
     }
 
     void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
