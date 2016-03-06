@@ -11,16 +11,6 @@
 #include "talk/app/webrtc/test/fakeconstraints.h"
 
 namespace dynastat {
-    void Conductor::count() {
-        Json::Value json;
-        Json::FastWriter writer;
-        while (running) {
-            json["sensors"] = m_device->readSensors();
-            webrtc::DataBuffer buffer(writer.write(json));
-            dataChannel->Send(buffer);
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        }
-    }
 
     int Conductor::AddRef() const {
         return 0;
@@ -43,8 +33,10 @@ namespace dynastat {
         std::string label = data_channel->label();
 
         if (label == "data") {
-            this->dataChannel = data_channel;
-            new boost::thread([=] { count(); });
+            this->m_tx = data_channel;
+            this->m_device->addClient(this);
+        } else if (label == "control") {
+            this->m_rx = data_channel;
         }
     }
 
@@ -60,25 +52,12 @@ namespace dynastat {
 
     }
 
-    void Conductor::GenerateAnswer(std::string &offer) {
-
-    }
-
     void Conductor::OnFailure(const std::string &error) {
 
     }
 
     void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
         m_peerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), desc);
-
-//    std::string sdp;
-//    desc->ToString(&sdp);
-//
-//    Json::Value answer;
-//    answer["type"] = "answer";
-//    answer["sdp"] = sdp;
-//
-//
     }
 
     void Conductor::OnRenegotiationNeeded() {
@@ -106,7 +85,7 @@ namespace dynastat {
         std::cout << "Recieved message: " << jmessage["message"].asString() << std::endl;
 
         // Simple test to check if we can send through the DC as well.
-        dataChannel->Send(buffer);
+        m_tx->Send(buffer);
     }
 
     void Conductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
@@ -194,5 +173,17 @@ namespace dynastat {
         peerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
 
         peerConnection->CreateAnswer(conductor, NULL);
+    }
+
+    void Conductor::updateStatus() {
+        Json::Value json;
+        Json::FastWriter writer;
+        json["sensors"] = m_device->readSensors();
+        webrtc::DataBuffer buffer(writer.write(json));
+        m_tx->Send(buffer);
+    }
+
+    Conductor::~Conductor() {
+        m_device->removeClient(this);
     }
 };

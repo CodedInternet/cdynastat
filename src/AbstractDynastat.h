@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include <json/value.h>
+#include <boost/thread/thread.hpp>
 
 namespace dynastat {
 
@@ -64,9 +65,18 @@ namespace dynastat {
     typedef std::map<std::string, AbstractSensor *> SensorMap;
     typedef std::map<std::string, AbstractMotor *> MotorMap;
 
+    class DynastatObserver {
+    public:
+        DynastatObserver() { };
+
+        virtual  ~DynastatObserver() { };
+
+        virtual void updateStatus() = 0;
+    };
+
     class AbstractDynastat {
     public:
-        AbstractDynastat() { };
+        AbstractDynastat();
 
         virtual ~AbstractDynastat();
 
@@ -75,6 +85,12 @@ namespace dynastat {
         virtual int readMotor(std::string name);
 
         virtual void setMotor(std::string name, int pos);
+
+        virtual void notifyClients();
+
+        virtual void addClient(DynastatObserver *client);
+
+        virtual void removeClient(DynastatObserver *client);
 
         const char *kConfSensors = "sensors";
         const char *kConfRows = "rows";
@@ -85,8 +101,13 @@ namespace dynastat {
         const char *kConfBaseAddress = "base_address";
 
     protected:
+        virtual void clientNotifier();
+
         MotorMap motors;
         SensorMap sensors;
+        std::vector<DynastatObserver *> clients;
+        bool running = true;
+        boost::thread *clientNotifierThread;
     };
 }
 

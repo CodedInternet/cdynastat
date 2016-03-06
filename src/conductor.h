@@ -59,8 +59,13 @@ namespace dynastat {
             : public webrtc::PeerConnectionObserver,
               public webrtc::CreateSessionDescriptionObserver,
               public webrtc::DataChannelObserver,
-              public webrtc::IceObserver {
+              public webrtc::IceObserver,
+              public dynastat::DynastatObserver {
     public:
+
+        ~Conductor();
+
+        virtual void updateStatus();
 
         virtual void OnStateChange() override;
 
@@ -94,15 +99,11 @@ namespace dynastat {
 
         virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override;
 
-        void count();
-
-        void GenerateAnswer(std::string &offer);
-
     private:
 
 //        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;
-        rtc::scoped_refptr<webrtc::DataChannelInterface> dataChannel;
+        rtc::scoped_refptr<webrtc::DataChannelInterface> m_tx, m_rx;
         std::shared_ptr<dynastat::AbstractDynastat> m_device;
         std::shared_ptr<PeerConnectionClient> m_connectionClient;
         int m_connectionClientId;

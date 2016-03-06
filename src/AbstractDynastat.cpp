@@ -49,6 +49,10 @@ int AbstractMotor::scalePos(int val, bool up) {
 }
 
 AbstractDynastat::~AbstractDynastat() {
+    // stop running subthreads
+    running = false;
+    clientNotifierThread->join();
+
   for (std::map<std::string, AbstractMotor *>::iterator it = motors.begin(); it != motors.end(); ++it) {
     delete it->second;
     motors.erase(it->first);
@@ -113,5 +117,37 @@ Json::Value AbstractDynastat::readSensors() {
         assert(col < cols);
 
         return col * rows + row;
+    }
+
+    void AbstractDynastat::notifyClients() {
+        for (auto client : clients) {
+            client->updateStatus();
+        }
+    }
+
+    void AbstractDynastat::addClient(DynastatObserver *client) {
+        clients.push_back(client);
+    }
+
+    void AbstractDynastat::removeClient(DynastatObserver *target) {
+        int i = 0;
+        for (auto client : clients) {
+            if (client == target) {
+                delete client;
+                clients.erase(clients.begin() + i);
+            }
+            ++i;
+        }
+    }
+
+    AbstractDynastat::AbstractDynastat() {
+        clientNotifierThread = new boost::thread(boost::bind(&AbstractDynastat::clientNotifier, this));
+    }
+
+    void AbstractDynastat::clientNotifier() {
+        while (running) {
+            notifyClients();
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 30));
+        }
     }
 }
