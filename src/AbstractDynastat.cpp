@@ -147,7 +147,22 @@ Json::Value AbstractDynastat::readSensors() {
     void AbstractDynastat::clientNotifier() {
         while (running) {
             notifyClients();
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 30));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / framerate));
         }
+    }
+
+    Json::Value AbstractMotor::getState() {
+        Json::Value json;
+        json["target"] = getPosition();
+        json["current"] = getCurrentPosition();
+        return json;
+    }
+
+    Json::Value AbstractDynastat::readMotors() {
+        Json::Value result = Json::objectValue;
+        for (MotorMap::iterator it1 = motors.begin(); it1 != motors.end(); ++it1) {
+            result[it1->first] = it1->second->getState();
+        }
+        return result;
     }
 }

@@ -23,6 +23,8 @@ namespace dynastat {
 
         ~SimulatedMotor();
 
+        virtual int getCurrentPosition();
+
         virtual int getPosition();
 
         virtual void setPosition(int pos);

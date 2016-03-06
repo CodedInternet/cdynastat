@@ -45,9 +45,13 @@ namespace dynastat {
 
         virtual ~AbstractMotor() { };
 
+        virtual int getCurrentPosition() = 0;
+
         virtual int getPosition() = 0;
 
         virtual void setPosition(int pos) = 0;
+
+        virtual Json::Value getState();
 
     protected:
         const int bits = 8;
@@ -56,7 +60,6 @@ namespace dynastat {
 
         int position = 2 ^bits - 1 / 2;
 
-    private:
         virtual int scalePos(int val, bool up = true);
 
         virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
@@ -67,9 +70,7 @@ namespace dynastat {
 
     class DynastatObserver {
     public:
-        DynastatObserver() { };
-
-        virtual  ~DynastatObserver() { };
+        virtual ~DynastatObserver() = default;
 
         virtual void updateStatus() = 0;
     };
@@ -81,6 +82,8 @@ namespace dynastat {
         virtual ~AbstractDynastat();
 
         virtual Json::Value readSensors();
+
+        virtual Json::Value readMotors();
 
         virtual int readMotor(std::string name);
 
@@ -106,6 +109,8 @@ namespace dynastat {
         const char *kConfHigh = "high";
         const char *kConfSpeed = "speed";
         const char *kConfDamping = "damping";
+
+        const int framerate = 12;
 
     protected:
         virtual void clientNotifier();

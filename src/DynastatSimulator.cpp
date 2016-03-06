@@ -58,11 +58,12 @@ namespace dynastat {
     }
 
     int SimulatedMotor::getPosition() {
-        return 0;
+        return position;
     }
 
     void SimulatedMotor::setPosition(int pos) {
-
+        position = pos;
+        targetPosition = scalePos(position);
     }
 
     SimulatedSensor::SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols,
@@ -127,17 +128,32 @@ namespace dynastat {
         this->rawLow = low;
         this->rawHigh = high;
         this->speed = speed;
+
+        worker = new boost::thread(boost::bind(&SimulatedMotor::performMovement, this));
     }
 
     void SimulatedMotor::performMovement() {
         while (running) {
             int diff = targetPosition - currentPosition;
+            if (abs(diff) > speed) {
+                if (diff < 0) {
+                    diff = -speed;
+                } else {
+                    diff = speed;
+                }
+            }
+            currentPosition += diff;
 
+            boost::this_thread::sleep(boost::posix_time::milliseconds(20));
         }
     }
 
     SimulatedMotor::~SimulatedMotor() {
         running = false;
         worker->join();
+    }
+
+    int SimulatedMotor::getCurrentPosition() {
+        return scalePos(currentPosition, false);
     }
 }

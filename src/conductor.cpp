@@ -179,6 +179,7 @@ namespace dynastat {
         Json::Value json;
         Json::FastWriter writer;
         json["sensors"] = m_device->readSensors();
+        json["motors"] = m_device->readMotors();
         webrtc::DataBuffer buffer(writer.write(json));
         m_tx->Send(buffer);
     }
