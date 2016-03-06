@@ -10,6 +10,7 @@ namespace dynastat {
     DynastatSimulator::DynastatSimulator(Json::Value &config) {
         switch (config.get("version", 0).asInt()) {
             case 1: {
+                // setup sensors
                 const Json::Value sensorConfig = config[kConfSensors];
                 for (Json::ValueIterator itr = sensorConfig.begin(); itr != sensorConfig.end(); itr++) {
                     std::string name = itr.key().asString();
@@ -25,9 +26,30 @@ namespace dynastat {
                     const unsigned short fullValue = (const unsigned short) conf[kConfFullValue].asUInt();
                     const unsigned short baseAddress = (const unsigned short) conf[kConfBaseAddress].asUInt();
 
-                    SimulatedSensor *sensor = new SimulatedSensor(baseAddress, rows, cols, zeroValue, halfValue, fullValue);
+                    SimulatedSensor *sensor = new SimulatedSensor(baseAddress, rows, cols, zeroValue, halfValue,
+                                                                  fullValue);
 
                     sensors[name] = sensor;
+                }
+                // setup motors
+
+                const Json::Value motorConfig = config[kConfMotors];
+                for (Json::ValueIterator itr = motorConfig.begin(); itr != motorConfig.end(); itr++) {
+                    std::string name = itr.key().asString();
+                    const Json::Value conf = motorConfig[name];
+                    if (conf == false or !conf.get(kConfAddress, 0).asInt()) {
+                        continue;
+                    }
+
+                    const unsigned short address = (const unsigned short) conf[kConfAddress].asUInt();
+                    const int32_t cal = conf[kConfCal].asInt();
+                    const int32_t low = conf[kConfLow].asInt();
+                    const int32_t high = conf[kConfHigh].asInt();
+                    const int16_t speed = (const int16_t) conf[kConfSpeed].asInt();
+                    const int16_t damping = (const int16_t) conf[kConfDamping].asInt();
+
+                    SimulatedMotor *motor = new SimulatedMotor(address, cal, low, high, speed, damping);
+                    motors[name] = motor;
                 }
                 break;
 
@@ -43,7 +65,8 @@ namespace dynastat {
 
     }
 
-    SimulatedSensor::SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols, unsigned short zeroValue,
+    SimulatedSensor::SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols,
+                                     unsigned short zeroValue,
                                      unsigned short halfValue,
                                      unsigned short fullValue) {
         this->rows = rows;
@@ -97,5 +120,24 @@ namespace dynastat {
 
     unsigned int SimulatedSensor::getValue(int row, int col) {
         return scaleValue(buffer[getOffset(row, col)]);
+    }
+
+    SimulatedMotor::SimulatedMotor(unsigned short address, int32_t cal, int32_t low, int32_t high, int16_t speed,
+                                   int16_t damping) {
+        this->rawLow = low;
+        this->rawHigh = high;
+        this->speed = speed;
+    }
+
+    void SimulatedMotor::performMovement() {
+        while (running) {
+            int diff = targetPosition - currentPosition;
+
+        }
+    }
+
+    SimulatedMotor::~SimulatedMotor() {
+        running = false;
+        worker->join();
     }
 }

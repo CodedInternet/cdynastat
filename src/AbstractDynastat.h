@@ -93,12 +93,19 @@ namespace dynastat {
         virtual void removeClient(DynastatObserver *client);
 
         const char *kConfSensors = "sensors";
+        const char *kConfMotors = "motors";
         const char *kConfRows = "rows";
         const char *kConfCols = "cols";
         const char *kConfZeroValue = "zero_value";
         const char *kConfHalfValue = "half_value";
         const char *kConfFullValue = "full_value";
         const char *kConfBaseAddress = "base_address";
+        const char *kConfAddress = "address";
+        const char *kConfCal = "cal";
+        const char *kConfLow = "low";
+        const char *kConfHigh = "high";
+        const char *kConfSpeed = "speed";
+        const char *kConfDamping = "damping";
 
     protected:
         virtual void clientNotifier();

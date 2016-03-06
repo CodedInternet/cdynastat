@@ -11,37 +11,51 @@
 #include <mutex>
 
 namespace dynastat {
-class DynastatSimulator: public AbstractDynastat {
- public:
-  DynastatSimulator(Json::Value &config);
-};
+    class DynastatSimulator : public AbstractDynastat {
+    public:
+        DynastatSimulator(Json::Value &config);
+    };
 
-class SimulatedMotor: public AbstractMotor {
+    class SimulatedMotor : public AbstractMotor {
 
- public:
-  virtual int getPosition();
+    public:
+        SimulatedMotor(unsigned short address, int32_t cal, int32_t low, int32_t high, int16_t speed, int16_t damping);
 
-  virtual void setPosition(int pos);
-};
+        ~SimulatedMotor();
 
-class SimulatedSensor: public AbstractSensor {
- public:
-    virtual unsigned int getValue(int row, int col) override;
+        virtual int getPosition();
 
-  void updateValue();
+        virtual void setPosition(int pos);
 
-    SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols, unsigned short zeroValue,
-                    unsigned short halfValue, unsigned short fullValue);
+    private:
+        void performMovement();
 
-  ~SimulatedSensor();
+        int16_t speed;
+        int32_t currentPosition;
+        int32_t targetPosition;
 
- private:
-  boost::thread *worker;
-    std::mutex lock;
-  bool running = true;
-    const int range = 200;
-    uint16_t *buffer;
-};
+        bool running = true;
+        boost::thread *worker;
+    };
+
+    class SimulatedSensor : public AbstractSensor {
+    public:
+        virtual unsigned int getValue(int row, int col) override;
+
+        void updateValue();
+
+        SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols, unsigned short zeroValue,
+                        unsigned short halfValue, unsigned short fullValue);
+
+        ~SimulatedSensor();
+
+    private:
+        boost::thread *worker;
+        std::mutex lock;
+        bool running = true;
+        const int range = 200;
+        uint16_t *buffer;
+    };
 }
 
 
