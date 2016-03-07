@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.2)
 project(cdynastat)
 include(DownloadProject.cmake)
 enable_testing()
+add_definitions(-DWEBRTC_POSIX)
 # https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
 if (CMAKE_VERSION VERSION_LESS 3.2)
     set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
