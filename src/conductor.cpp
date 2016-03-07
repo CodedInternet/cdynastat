@@ -82,10 +82,18 @@ namespace dynastat {
             return;
         }
 
-        std::cout << "Recieved message: " << jmessage["message"].asString() << std::endl;
-
-        // Simple test to check if we can send through the DC as well.
-        m_tx->Send(buffer);
+        if (jmessage["cmd"] == "set_motor") {
+            std::string name = jmessage["name"].asString();
+            int value = jmessage["value"].asInt();
+            try {
+                m_device->setMotor(name, value);
+            } catch (std::out_of_range) {
+                std::cerr << "Unkown motor: " << name << std::endl;
+                return;
+            } catch (std::invalid_argument) {
+                std::cerr << "Unacceptable argument" << std::endl;
+            }
+        }
     }
 
     void Conductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {

@@ -13,8 +13,8 @@ int AbstractDynastat::readMotor(std::string name) {
 }
 
 void AbstractDynastat::setMotor(std::string name, int pos) {
-  AbstractMotor *motor = motors.at(name);
-  motor->setPosition(pos);
+    AbstractMotor *motor = motors.at(name);
+    motor->setPosition(pos);
 }
 
 int AbstractMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
@@ -31,12 +31,12 @@ int AbstractMotor::translateValue(int val, int leftMin, int leftMax, int rightMi
 
 int AbstractMotor::scalePos(int val, bool up) {
   if (up) {
-    if (val < 0 or val > (2 ^ bits)) {
+      if (val < 0 or val > pow(2, bits)) {
       throw std::invalid_argument(
-          "Value " + std::to_string(val) + " is not in the range 0, " + std::to_string(2 ^ bits - 1));
+              "Value " + std::to_string(val) + " is not in the range 0, " + std::to_string(pow(2, bits) - 1));
     }
 
-    return translateValue(val, 0, 2 ^ bits - 1, rawLow, rawHigh);
+      return translateValue(val, 0, (int) (pow(2, bits) - 1), rawLow, rawHigh);
   } else {
     if (val < rawLow or val > rawHigh) {
       throw std::invalid_argument(
@@ -44,7 +44,7 @@ int AbstractMotor::scalePos(int val, bool up) {
               + std::to_string(rawHigh));
     }
 
-    return translateValue(val, rawLow, rawHigh, 0, 2 ^ bits - 1);
+      return translateValue(val, rawLow, rawHigh, 0, (int) (pow(2, bits) - 1));
   }
 }
 
