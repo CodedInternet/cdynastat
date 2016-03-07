@@ -11,7 +11,14 @@ namespace dynastat {
     public:
         const float kScaleTolerance = 0.1;
 
-        virtual int readValue();
+        TestAbstractSensor() {
+            rows = 10;
+            cols = 16;
+        }
+
+        virtual int readValue() {
+            return -1;
+        };
 
         int getScaleValue(int val) {
             return scaleValue(val);
@@ -25,15 +32,15 @@ namespace dynastat {
             return setScale(zeroValue, halfValue, fullValue);
         }
 
+        int doGetOffset(unsigned short row, unsigned short col) {
+            return getOffset(row, col);
+        }
+
     private:
         virtual unsigned int getValue(int row, int col) override {
             return 0;
         };
     };
-
-    int TestAbstractSensor::readValue() {
-        return -1;
-    }
 
     TEST(SensorTest, CalculateScale) {
         TestAbstractSensor sensor;
@@ -67,5 +74,27 @@ namespace dynastat {
         // check out of bounds
         EXPECT_EQ(0, sensor.getScaleValue(-1));
         EXPECT_EQ(255, sensor.getScaleValue(256));
+
+        // Quick doubling check
+        sensor.doSetScale(0, 255, 512);
+        EXPECT_EQ(0, sensor.getScaleValue(0));
+        EXPECT_EQ(127, sensor.getScaleValue(255));
+        EXPECT_EQ(255, sensor.getScaleValue(512));
+
+        // Some large realistic values - scale = ~268.55
+        sensor.doSetScale(24, 36213, 64536);
+        EXPECT_EQ(0, sensor.getScaleValue(24));
+        EXPECT_EQ(127, sensor.getScaleValue(34105));
+        EXPECT_EQ(255, sensor.getScaleValue(68480));
+    }
+
+    TEST(SensorTest, OffsetTest) {
+        TestAbstractSensor sensor;
+
+        EXPECT_EQ(0, sensor.doGetOffset(0, 0));
+        EXPECT_EQ(3, sensor.doGetOffset(3, 0));
+        EXPECT_EQ(10, sensor.doGetOffset(0, 1));
+        EXPECT_EQ(34, sensor.doGetOffset(4, 3));
+        EXPECT_EQ(159, sensor.doGetOffset(9, 15));
     }
 }
