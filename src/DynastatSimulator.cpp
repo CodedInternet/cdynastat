@@ -133,13 +133,14 @@ namespace dynastat {
     }
 
     void SimulatedMotor::performMovement() {
+        const int sf = 10;
         while (running) {
             int diff = targetPosition - currentPosition;
-            if (abs(diff) > speed) {
+            if (abs(diff) > speed / sf) {
                 if (diff < 0) {
-                    diff = -speed;
+                    diff = -speed / sf;
                 } else {
-                    diff = speed;
+                    diff = speed / sf;
                 }
             }
             currentPosition += diff;
