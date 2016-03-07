@@ -42,6 +42,26 @@ namespace dynastat {
         };
     };
 
+    class TestAbstractMotor : AbstractMotor {
+    public:
+        TestAbstractMotor() {
+            rawLow = -2550;
+            rawHigh = 2550;
+        }
+
+        int doScalePos(int val, bool up = true) {
+            return scalePos(val, up);
+        };
+
+        int getCurrentPosition() {
+            return getPosition();
+        }
+
+        void setPosition(int pos) {
+            position = pos;
+        }
+    };
+
     TEST(SensorTest, CalculateScale) {
         TestAbstractSensor sensor;
 
@@ -96,5 +116,18 @@ namespace dynastat {
         EXPECT_EQ(10, sensor.doGetOffset(0, 1));
         EXPECT_EQ(34, sensor.doGetOffset(4, 3));
         EXPECT_EQ(159, sensor.doGetOffset(9, 15));
+    }
+
+    TEST(AbstractMotor, TestScalling) {
+        TestAbstractMotor motor;
+
+        EXPECT_EQ(-2550, motor.doScalePos(0));
+        EXPECT_EQ(-10, motor.doScalePos(127));
+        EXPECT_EQ(10, motor.doScalePos(128));
+        EXPECT_EQ(2550, motor.doScalePos(255));
+
+        EXPECT_EQ(255, motor.doScalePos(2550, false));
+        EXPECT_EQ(0, motor.doScalePos(-2550, false));
+        EXPECT_EQ(127, motor.doScalePos(0, false));
     }
 }

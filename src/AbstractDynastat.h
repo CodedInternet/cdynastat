@@ -41,13 +41,12 @@ namespace dynastat {
 
     class AbstractMotor {
     public:
-        AbstractMotor() { };
 
-        virtual ~AbstractMotor() { };
+        virtual ~AbstractMotor() = default;
 
         virtual int getCurrentPosition() = 0;
 
-        virtual int getPosition() = 0;
+        virtual int getPosition();
 
         virtual void setPosition(int pos) = 0;
 
@@ -58,7 +57,7 @@ namespace dynastat {
         int rawLow;
         int rawHigh;
 
-        int position = 2 ^bits - 1 / 2;
+        int position = (int) (pow(2, bits) - 1 / 2);
 
         virtual int scalePos(int val, bool up = true);
 

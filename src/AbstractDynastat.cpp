@@ -165,4 +165,8 @@ Json::Value AbstractDynastat::readSensors() {
         }
         return result;
     }
+
+    int AbstractMotor::getPosition() {
+        return position;
+    }
 }
