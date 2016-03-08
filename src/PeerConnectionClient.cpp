@@ -223,7 +223,7 @@ namespace dynastat {
     }
 
     context_ptr PeerConnectionClient::on_tls_init(websocketpp::connection_hdl) {
-        context_ptr ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::sslv23);
+        context_ptr ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
 
         auto options = boost::asio::ssl::context::default_workarounds | boost::asio::ssl::context::single_dh_use;
         if (!verify_ssl) {
