@@ -31,7 +31,7 @@ namespace dynastat {
 
         virtual int getOffset(unsigned short row, unsigned short col);
 
-        const uint8_t bits = 8;
+        const uint8_t bits = 16;
         unsigned short address;
         unsigned short rows;
         unsigned short cols;

@@ -5,8 +5,8 @@
 #include <json/reader.h>
 
 #include "conductor.h"
-//#include "Dynastat.h"
-#include "DynastatSimulator.h"
+#include "Dynastat.h"
+//#include "DynastatSimulator.h"
 #include "PeerConnectionClient.h"
 
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    std::shared_ptr<dynastat::DynastatSimulator> device = std::make_shared<dynastat::DynastatSimulator>(root);
+    std::shared_ptr<dynastat::Dynastat> device = std::make_shared<dynastat::Dynastat>(root);
 
     std::shared_ptr<dynastat::PeerConnectionClient> connectionClient = std::make_shared<dynastat::PeerConnectionClient>();
     dynastat::ConductorFactory* conductorFactory = new dynastat::ConductorFactory(connectionClient, device);

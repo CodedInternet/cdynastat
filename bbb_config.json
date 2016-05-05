@@ -1,9 +1,12 @@
 {
   "version": 1,
-
   "signaling_servers": [
-    "ws://127.0.0.1:8000/ws/device/test/"
+    "ws://192.168.7.1:8000/ws/device/test/"
   ],
+  "i2c_bus": {
+    "motor": 1,
+    "sensor": 2
+  },
 
   "motors": {
     "left_foot_size": {
@@ -26,52 +29,64 @@
 
   "sensors": {
     "left_mtp": {
+      "address": 32,
+      "mode": 1,
+      "registry": 1,
       "rows": 10,
       "cols": 16,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 16
+      "full_value": 65535
     },
     "left_hallux": {
+      "address": 32,
+      "mode": 1,
+      "registry": 2,
       "rows": 12,
       "cols": 6,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 16
+      "full_value": 65535
     },
     "left_heel": {
+      "address": 32,
+      "mode": 2,
+      "registry": 1,
       "rows": 10,
       "cols": 10,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 16
+      "full_value": 6553
     },
     "right_mtp": {
+      "address": 32,
+      "mode": 1,
+      "registry": 1,
       "rows": 10,
       "cols": 16,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 192
+      "full_value": 65535
     },
     "right_hallux": {
+      "address": 32,
+      "mode": 1,
+      "registry": 2,
       "rows": 12,
       "cols": 6,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 192
+      "full_value": 65535
     },
     "right_heel": {
+      "address": 32,
+      "mode": 1,
+      "registry": 1,
       "rows": 10,
       "cols": 10,
       "zero_value": 0,
       "half_value": 32768,
-      "full_value": 65535,
-      "base_address": 192
+      "full_value": 65535
     }
   }
 }
