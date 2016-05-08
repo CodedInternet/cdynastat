@@ -75,28 +75,25 @@ namespace dynastat {
     }
 
     void RMCS220xMotor::setPosition(int pos) {
+        pos = scalePos(pos, true);
+        move(pos);
+        return;
+    }
+
+    void RMCS220xMotor::move(int pos) {
         uint8_t b[4];
         b[0] = (uint8_t) (pos & 0xff);
         b[1] = (uint8_t) ((pos >> 8) & 0xff);
         b[2] = (uint8_t) ((pos >> 16) & 0xff);
         b[3] = (uint8_t) (pos >> 24);
-        fprintf(stdout, "Setting to %d: 0x%x 0x%x 0x%x 0x%x\n", pos, b[0], b[1], b[2], b[3]);
         bus->put(address, REG_GOTO, b, 4);
         return;
-    }
-
-    int RMCS220xMotor::scalePos(int val, bool up) {
-        return 0;
-    }
-
-    int RMCS220xMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
-        return 0;
     }
 
     void RMCS220xMotor::home() {
         // @TODO: Use the I2C bus to home to motors correctly.
         std::cout << "Homing " << address << std::endl;
-        setPosition(0);
+        move(0);
         return;
     }
 

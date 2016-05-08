@@ -9,11 +9,11 @@
   },
 
   "motors": {
-    "left_rearfoot_frontal": {
+    "left_first_ray": {
       "address": 8,
-      "cal": -450,
-      "low": -900,
-      "high": 900,
+      "cal": -700,
+      "low": -450,
+      "high": 0,
       "speed": 255,
       "damping": 127
     }

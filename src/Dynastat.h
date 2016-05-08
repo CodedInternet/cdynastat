@@ -52,9 +52,7 @@ namespace dynastat {
         I2CBus *bus;
         int address;
 
-        virtual int scalePos(int val, bool up);
-
-        virtual int translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax);
+        void move(int pos);
 
         void home();
     };
