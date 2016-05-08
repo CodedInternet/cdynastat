@@ -60,11 +60,13 @@ namespace dynastat {
         this->rawLow = rawLow;
         this->rawHigh = rawHigh;
 
-//        uint16_t buffer[1];
-//        buffer[0] = (uint16_t) speed;
-//        bus->put(address, REG_MAX_SPEED, buffer, 1);
-//        buffer[0] = (uint16_t) damping;
-//        bus->put(address, REG_DAMPING, buffer, 1);
+        uint8_t b[2];
+        b[0] = (uint8_t) (speed & 0xff);
+        b[1] = (uint8_t) (speed >> 8);
+        bus->put(address, REG_MAX_SPEED, b, 2);
+        b[0] = (uint8_t) (damping & 0xff);
+        b[1] = (uint8_t) (damping >> 8);
+        bus->put(address, REG_DAMPING, b, 2);
 
         home();
         return;

@@ -14,7 +14,7 @@
       "cal": -700,
       "low": -450,
       "high": 0,
-      "speed": 255,
+      "speed": 50,
       "damping": 127
     }
   },
