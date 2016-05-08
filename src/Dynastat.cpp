@@ -42,7 +42,7 @@ namespace dynastat {
         lock.lock();
         connect(i2caddr);
 
-        i2c_smbus_write_block_data(fd, command, length, buffer);
+        i2c_smbus_write_i2c_block_data(fd, command, length, buffer);
 
         lock.unlock();
     }
@@ -80,6 +80,7 @@ namespace dynastat {
         b[1] = (uint8_t) ((pos >> 8) & 0xff);
         b[2] = (uint8_t) ((pos >> 16) & 0xff);
         b[3] = (uint8_t) (pos >> 24);
+        fprintf(stdout, "Setting to %d: 0x%x 0x%x 0x%x 0x%x\n", pos, b[0], b[1], b[2], b[3]);
         bus->put(address, REG_GOTO, b, 4);
         return;
     }

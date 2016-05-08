@@ -108,7 +108,6 @@ namespace dynastat {
             answer["sdp"] = sdp;
 
             m_connectionClient->send(m_connectionClientId, writer.write(answer));
-            std::cout << "Answer: " << writer.write(answer);
         }
     }
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "signaling_servers": [
-    "ws://10.20.30.20:8000/ws/device/test/"
+    "ws://192.168.7.1:8000/ws/device/test/"
   ],
   "i2c_bus": {
     "motor": 1,
@@ -10,7 +10,7 @@
 
   "motors": {
     "left_rearfoot_frontal": {
-      "address": 10,
+      "address": 8,
       "cal": -450,
       "low": -900,
       "high": 900,
