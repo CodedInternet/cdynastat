@@ -38,24 +38,35 @@ namespace dynastat {
         lock.unlock();
     }
 
-    void I2CBus::put(int i2caddr, uint16_t regaddr, uint16_t *buffer, size_t length) {
+    void I2CBus::put(int i2caddr, uint8_t command, uint8_t *buffer, size_t length) {
         lock.lock();
+        connect(i2caddr);
+
+        i2c_smbus_write_block_data(fd, command, length, buffer);
+
+        lock.unlock();
+    }
+
+    int I2CBus::connect(int i2caddr) {
         if (ioctl(fd, I2C_SLAVE, i2caddr) < 0) {
             printf("Unable to open I2C device 0x%02X\n", i2caddr);
             throw;
         }
-
-        uint16_t tmp = buffer[0];
-        buffer[0] = regaddr;
-        write(fd, buffer, 1);
-        buffer[0] = tmp;
-        write(fd, buffer, length);
-        lock.unlock();
     }
 
-    RMCS220xMotor::RMCS220xMotor(int rawLow, int rawHigh, int address, int bus, int speed, int damping) {
+    RMCS220xMotor::RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int speed, int damping) {
+        this->bus = bus;
+        this->address = address;
         this->rawLow = rawLow;
         this->rawHigh = rawHigh;
+
+//        uint16_t buffer[1];
+//        buffer[0] = (uint16_t) speed;
+//        bus->put(address, REG_MAX_SPEED, buffer, 1);
+//        buffer[0] = (uint16_t) damping;
+//        bus->put(address, REG_DAMPING, buffer, 1);
+
+        home();
         return;
     }
 
@@ -64,6 +75,12 @@ namespace dynastat {
     }
 
     void RMCS220xMotor::setPosition(int pos) {
+        uint8_t b[4];
+        b[0] = (uint8_t) (pos & 0xff);
+        b[1] = (uint8_t) ((pos >> 8) & 0xff);
+        b[2] = (uint8_t) ((pos >> 16) & 0xff);
+        b[3] = (uint8_t) (pos >> 24);
+        bus->put(address, REG_GOTO, b, 4);
         return;
     }
 
@@ -73,6 +90,13 @@ namespace dynastat {
 
     int RMCS220xMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
         return 0;
+    }
+
+    void RMCS220xMotor::home() {
+        // @TODO: Use the I2C bus to home to motors correctly.
+        std::cout << "Homing " << address << std::endl;
+        setPosition(0);
+        return;
     }
 
     DynastatSensor::DynastatSensor(I2CBus *bus, uint16_t address, uint mode, uint registry, unsigned short rows,
@@ -111,21 +135,23 @@ namespace dynastat {
                 sensorBus = new I2CBus(sBus);
                 motorBus = new I2CBus(mBus);
 
-                const Json::Value motorConfig = config["motors"];
+                const Json::Value motorConfig = config[kConfMotors];
                 for (Json::ValueIterator itr = motorConfig.begin(); itr != motorConfig.end(); itr++) {
-                    Json::Value conf = motorConfig[itr.memberName()];
-                    if (conf == false or conf.get("address", 0).asInt()) {
+                    std::string name = itr.key().asString();
+                    const Json::Value conf = motorConfig[name];
+
+                    if (conf == false or !conf.get(kConfAddress, 0).asInt()) {
+                        std::cerr << "Cannot setup motor " << name << std::endl;
                         continue;
                     }
-                    RMCS220xMotor *motor = new RMCS220xMotor(
-                            conf["low"].asInt(),
-                            conf["high"].asInt(),
-                            conf["address"].asInt(),
-                            conf.get("bus", -1).asInt(),
-                            conf["speed"].asInt(),
-                            conf["damping"].asInt()
-                    );
-                    motors[itr.key().asString()] = motor;
+
+                    RMCS220xMotor *motor = new RMCS220xMotor(motorBus,
+                                                             conf[kConfAddress].asInt(),
+                                                             conf[kConfLow].asInt(),
+                                                             conf[kConfHigh].asInt(),
+                                                             conf[kConfSpeed].asInt(),
+                                                             conf[kConfDamping].asInt());
+                    motors[name] = motor;
                 }
 
                 const Json::Value sensorConfig = config["sensors"];
