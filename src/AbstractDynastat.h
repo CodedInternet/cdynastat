@@ -27,11 +27,11 @@ namespace dynastat {
         virtual Json::Value readAll();
 
     protected:
-        virtual void setScale(unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue);
+        virtual void setScale(uint16_t zeroValue, uint16_t halfValue, uint16_t fullValue);
 
         virtual int getOffset(unsigned short row, unsigned short col);
 
-        const uint8_t bits = 16;
+        const uint8_t bits = 8;
         unsigned short address;
         unsigned short rows;
         unsigned short cols;
@@ -108,6 +108,7 @@ namespace dynastat {
         const char *kConfHigh = "high";
         const char *kConfSpeed = "speed";
         const char *kConfDamping = "damping";
+        const char *kConfControl = "control";
 
         const int framerate = 12;
 

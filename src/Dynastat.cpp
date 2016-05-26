@@ -6,6 +6,7 @@
 
 #include <linux/i2c-dev.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 
 
@@ -24,21 +25,29 @@ namespace dynastat {
         close(fd);
     }
 
-    void I2CBus::get(int i2caddr, uint16_t regaddr, uint16_t *buffer, size_t length) {
+    void I2CBus::get(int i2caddr, uint16_t command, uint8_t *buffer, size_t length) {
         lock.lock();
-        buffer[0] = regaddr;
+        connect(i2caddr);
 
-        if (ioctl(fd, I2C_SLAVE, i2caddr) < 0) {
-            printf("Unable to open I2C device 0x%02X\n", i2caddr);
-            throw;
-        }
+        i2c_smbus_read_i2c_block_data(fd, command, length, buffer);
 
-        write(fd, buffer, 1);
-        read(fd, buffer, length);
         lock.unlock();
     }
 
-    void I2CBus::put(int i2caddr, uint8_t command, uint8_t *buffer, size_t length) {
+    void I2CBus::getRaw(int i2caddr, uint16_t reg, uint8_t *buffer, size_t length) {
+        lock.lock();
+        connect(i2caddr);
+
+        buffer[0] = (uint8_t) (reg >> 8 & 0xff);
+        buffer[1] = (uint8_t) (reg & 0xff);
+        write(fd, buffer, 2);
+        read(fd, buffer, length);
+
+        lock.unlock();
+    }
+
+
+    void I2CBus::put(int i2caddr, uint16_t command, uint8_t *buffer, size_t length) {
         lock.lock();
         connect(i2caddr);
 
@@ -54,11 +63,13 @@ namespace dynastat {
         }
     }
 
-    RMCS220xMotor::RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int speed, int damping) {
+    RMCS220xMotor::RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
+                                     int control, I2CBus *controlBus) {
         this->bus = bus;
         this->address = address;
         this->rawLow = rawLow;
         this->rawHigh = rawHigh;
+        this->controlBus = controlBus;
 
         uint8_t b[2];
         b[0] = (uint8_t) (speed & 0xff);
@@ -68,18 +79,29 @@ namespace dynastat {
         b[1] = (uint8_t) (damping >> 8);
         bus->put(address, REG_DAMPING, b, 2);
 
-        home();
+        this->control = this->control << (control-1);
+
+        home(cal);
         return;
     }
 
     int RMCS220xMotor::getPosition() {
-        return 27;
+        int pos = readPosition();
+        return scalePos(pos, false);
     }
 
     void RMCS220xMotor::setPosition(int pos) {
         pos = scalePos(pos, true);
         move(pos);
         return;
+    }
+
+    int RMCS220xMotor::readPosition() {
+        uint8_t b[4];
+        int pos;
+        bus->get(address, REG_CALIBRATE, b, 4);
+        pos = (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | (b[0]);
+        return pos;
     }
 
     void RMCS220xMotor::move(int pos) {
@@ -92,14 +114,39 @@ namespace dynastat {
         return;
     }
 
-    void RMCS220xMotor::home() {
+    void RMCS220xMotor::home(int cal) {
         // @TODO: Use the I2C bus to home to motors correctly.
-        std::cout << "Homing " << address << std::endl;
+        int inc = std::abs(rawHigh - rawLow) / 10;
+        if(cal < 0) {
+            inc = -inc;
+        }
+
+        while(!readControl()) {
+            int pos = readPosition() + inc;
+            move(pos);
+        }
+
+        uint8_t b[4];
+        b[0] = (uint8_t) (cal & 0xff);
+        b[1] = (uint8_t) ((cal >> 8) & 0xff);
+        b[2] = (uint8_t) ((cal >> 16) & 0xff);
+        b[3] = (uint8_t) (cal >> 24);
+        bus->put(address, REG_CALIBRATE, b, 4);
+
         move(0);
         return;
     }
 
-    DynastatSensor::DynastatSensor(I2CBus *bus, uint16_t address, uint mode, uint registry, unsigned short rows,
+    bool RMCS220xMotor::readControl() {
+        uint8_t b[2];
+        uint16_t value;
+        controlBus->get(kControlAddress, 3, b, 2);
+        value = (b[1] << 8) | (b[0]);
+
+        return (~value & control);
+    };
+
+    DynastatSensor::DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, unsigned short rows,
                                    unsigned short cols, unsigned short zero_value, unsigned short half_value,
                                    unsigned short full_value) {
         this->address = address;
@@ -107,22 +154,41 @@ namespace dynastat {
         this->rows = rows;
         this->cols = cols;
 
-        length = rows * cols * sizeof(uint16_t);
-        buffer = (uint16_t *) malloc(length);
+        // Check the sensor ID is correct before we do anything
+        bus->get(address, 0x00, buffer, 2);
+        assert((buffer[1] << 8 | buffer[0]) == 0xFE01);
 
-        // Check the sensor is correct
-        bus->get(address, 0, buffer, 1);
-        assert(buffer[0] == 0xFE01);
+        buffer[0] = mode;
+        bus->put(address, REG_MODE, buffer, 1);
+
+        // calculate mapping offsets needed
+        switch(registry) {
+            case 1:
+                oCols = (kBank1Cols - cols) / 2;
+                break;
+
+            case 2:
+                oCols = kBank1Cols + (kBank2Cols - cols) / 2;
+                break;
+
+            default:
+                break;
+        }
+        oRows = (kRows - rows) / 2;
 
         setScale(zero_value, half_value, full_value);
-    }
 
-    DynastatSensor::~DynastatSensor() {
-        free(buffer);
+        fprintf(stdout, "Init sensor 0x%x.%d (%d, %d) in mode %d. Scale %f. \n", address, registry, rows, cols, mode, scale);
     }
 
     unsigned int DynastatSensor::getValue(int row, int col) {
-        return 0;
+        int reg = kBank1 + ((oRows + row) * kCols + col + oCols);
+        bus->getRaw(address, reg, buffer, 2);
+        uint16_t val = buffer[1] << 8 | buffer[0];
+        if(row + col == 0) {
+            std::cout << val << std::endl;
+        }
+        return scaleValue(val);
     }
 
     Dynastat::Dynastat(Json::Value &config) {
@@ -145,25 +211,25 @@ namespace dynastat {
                         continue;
                     }
 
-                    RMCS220xMotor *motor = new RMCS220xMotor(motorBus,
-                                                             conf[kConfAddress].asInt(),
-                                                             conf[kConfLow].asInt(),
-                                                             conf[kConfHigh].asInt(),
-                                                             conf[kConfSpeed].asInt(),
-                                                             conf[kConfDamping].asInt());
+                    RMCS220xMotor *motor = new RMCS220xMotor(motorBus, conf[kConfAddress].asInt(),
+                                                             conf[kConfLow].asInt(), conf[kConfHigh].asInt(), conf[kConfCal].asInt(),
+                                                             conf[kConfSpeed].asInt(), conf[kConfDamping].asInt(),
+                                                             conf[kConfControl].asInt(), sensorBus);
                     motors[name] = motor;
                 }
 
                 const Json::Value sensorConfig = config["sensors"];
                 for (Json::ValueIterator itr = sensorConfig.begin(); itr != sensorConfig.end(); itr++) {
-                    Json::Value conf = sensorConfig[itr.memberName()];
-                    if (conf == false or conf.get("address", 0).asInt()) {
+                    std::string name = itr.key().asString();
+                    const Json::Value conf = sensorConfig[name];
+
+                    if (conf == false or !conf.get(kConfAddress, 0).asInt()) {
                         continue;
                     }
 
                     DynastatSensor *sensor = new DynastatSensor(
                             sensorBus,
-                            (uint16_t) conf["address"].asUInt(),
+                            conf[kConfAddress].asInt(),
                             conf["mode"].asUInt(),
                             conf["registry"].asUInt(),
                             (unsigned short) conf["rows"].asInt(),

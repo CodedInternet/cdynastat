@@ -7,97 +7,98 @@
 
 namespace dynastat {
 
-int AbstractDynastat::readMotor(std::string name) {
-  AbstractMotor *motor = motors.at(name);
-  return motor->getPosition();
-}
-
-void AbstractDynastat::setMotor(std::string name, int pos) {
-    AbstractMotor *motor = motors.at(name);
-    motor->setPosition(pos);
-}
-
-int AbstractMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
-  // Figure out how 'wide' each range is
-  float leftSpan = leftMax - leftMin;
-  float rightSpan = rightMax - rightMin;
-
-  // Convert the left range into a 0-1 range (float)
-  float valueScaled = (val - leftMin) / leftSpan;
-
-  // Convert the 0-1 range into a value in the right range.
-  return (int) (rightMin + (valueScaled * rightSpan));
-}
-
-int AbstractMotor::scalePos(int val, bool up) {
-  if (up) {
-      if (val < 0 or val > pow(2, bits)) {
-      throw std::invalid_argument(
-              "Value " + std::to_string(val) + " is not in the range 0, " + std::to_string(pow(2, bits) - 1));
+    int AbstractDynastat::readMotor(std::string name) {
+        AbstractMotor *motor = motors.at(name);
+        return motor->getPosition();
     }
 
-      return translateValue(val, 0, (int) (pow(2, bits) - 1), rawLow, rawHigh);
-  } else {
-    if (val < rawLow or val > rawHigh) {
-      throw std::invalid_argument(
-          "Value " + std::to_string(val) + " is not in the range " + std::to_string(rawLow) + ", "
-              + std::to_string(rawHigh));
+    void AbstractDynastat::setMotor(std::string name, int pos) {
+        AbstractMotor *motor = motors.at(name);
+        motor->setPosition(pos);
     }
 
-      return translateValue(val, rawLow, rawHigh, 0, (int) (pow(2, bits) - 1));
-  }
-}
+    int AbstractMotor::translateValue(int val, int leftMin, int leftMax, int rightMin, int rightMax) {
+        // Figure out how 'wide' each range is
+        float leftSpan = leftMax - leftMin;
+        float rightSpan = rightMax - rightMin;
 
-AbstractDynastat::~AbstractDynastat() {
-    // stop running subthreads
-    running = false;
-    clientNotifierThread->join();
+        // Convert the left range into a 0-1 range (float)
+        float valueScaled = (val - leftMin) / leftSpan;
 
-  for (std::map<std::string, AbstractMotor *>::iterator it = motors.begin(); it != motors.end(); ++it) {
-    delete it->second;
-    motors.erase(it->first);
-  }
-
-  for (std::map<std::string, AbstractSensor *>::iterator it1 = sensors.begin(); it1 != sensors.end();
-       ++it1) {
-    delete it1->second;
-    sensors.erase(it1->first);
-  }
-}
-
-    void AbstractSensor::setScale(unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue) {
-  this->zeroValue = zeroValue;
-
-  double max = (pow(2, bits) - 1);
-  double m1 = halfValue / (max / 2) ;
-  double m2 = fullValue / max;
-
-  scale = (m1 + m2) / 2;
-}
-
-unsigned short AbstractSensor::scaleValue(int val) {
-  int scaled;
-  val -= zeroValue;
-
-  if (val < 0) {
-    scaled = 0;
-  } else {
-    scaled = (int) std::round(val / scale);
-
-    if (scaled > pow(2, bits) - 1) {
-      scaled = (int) (pow(2, bits) - 1);
+        // Convert the 0-1 range into a value in the right range.
+        return (int) (rightMin + (valueScaled * rightSpan));
     }
-  }
 
-  return scaled;
-}
-Json::Value AbstractDynastat::readSensors() {
-  Json::Value result = Json::objectValue;
-  for (SensorMap::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
-    result[it1->first] = it1->second->readAll();
-  }
-  return result;
-}
+    int AbstractMotor::scalePos(int val, bool up) {
+        if (up) {
+            if (val < 0 or val > pow(2, bits)) {
+                throw std::invalid_argument(
+                        "Value " + std::to_string(val) + " is not in the range 0, " + std::to_string(pow(2, bits) - 1));
+            }
+
+            return translateValue(val, 0, (int) (pow(2, bits) - 1), rawLow, rawHigh);
+        } else {
+            if (val < rawLow) {
+                val = rawLow;
+            } else if (val > rawHigh) {
+                val = rawHigh;
+            }
+
+            return translateValue(val, rawLow, rawHigh, 0, (int) (pow(2, bits) - 1));
+        }
+    }
+
+    AbstractDynastat::~AbstractDynastat() {
+        // stop running subthreads
+        running = false;
+        clientNotifierThread->join();
+
+        for (std::map<std::string, AbstractMotor *>::iterator it = motors.begin(); it != motors.end(); ++it) {
+            delete it->second;
+            motors.erase(it->first);
+        }
+
+        for (std::map<std::string, AbstractSensor *>::iterator it1 = sensors.begin(); it1 != sensors.end();
+             ++it1) {
+            delete it1->second;
+            sensors.erase(it1->first);
+        }
+    }
+
+    void AbstractSensor::setScale(uint16_t zeroValue, uint16_t halfValue, uint16_t fullValue) {
+        this->zeroValue = zeroValue;
+
+        double max = (pow(2, bits) - 1);
+        double m1 = halfValue / (max / 2);
+        double m2 = fullValue / max;
+
+        scale = (m1 + m2) / 2;
+    }
+
+    unsigned short AbstractSensor::scaleValue(int val) {
+        int scaled;
+        val -= zeroValue;
+
+        if (val < 0) {
+            scaled = 0;
+        } else {
+            scaled = (int) std::round(val / scale);
+
+            if (scaled > pow(2, bits) - 1) {
+                scaled = (int) (pow(2, bits) - 1);
+            }
+        }
+
+        return scaled;
+    }
+
+    Json::Value AbstractDynastat::readSensors() {
+        Json::Value result = Json::objectValue;
+        for (SensorMap::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
+            result[it1->first] = it1->second->readAll();
+        }
+        return result;
+    }
 
     Json::Value AbstractSensor::readAll() {
         Json::Value result;
@@ -116,7 +117,7 @@ Json::Value AbstractDynastat::readSensors() {
         assert(row < rows);
         assert(col < cols);
 
-        return col * rows + row;
+        return row * cols + col;
     }
 
     void AbstractDynastat::notifyClients() {

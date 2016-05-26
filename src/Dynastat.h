@@ -17,9 +17,11 @@ namespace dynastat {
 
         ~I2CBus();
 
-        void get(int i2caddr, uint16_t regaddr, uint16_t *buffer, size_t length);
+        void get(int i2caddr, uint16_t command, uint8_t *buffer, size_t length);
 
-        void put(int i2caddr, uint8_t command, uint8_t *buffer, size_t length);
+        void getRaw(int i2caddr, uint16_t reg, uint8_t *buffer, size_t length);
+
+        void put(int i2caddr, uint16_t command, uint8_t *buffer, size_t length);
 
     private:
         int connect(int i2caddr);
@@ -36,39 +38,58 @@ namespace dynastat {
             return 0;
         }
 
-        RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int speed, int damping);
+        RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
+                              int control, I2CBus *controlBus);
 
         virtual int getPosition();
 
         virtual void setPosition(int pos);
 
     private:
-        uint8_t REG_MAX_SPEED = 0;
-        uint8_t REG_MANUAL = 1;
-        uint8_t REG_DAMPING = 2;
-        uint8_t REG_CALIBRATE = 3;
-        uint8_t REG_GOTO = 4;
+        uint16_t REG_MAX_SPEED = 0;
+        uint16_t REG_MANUAL = 1;
+        uint16_t REG_DAMPING = 2;
+        uint16_t REG_CALIBRATE = 3;
+        uint16_t REG_GOTO = 4;
 
         I2CBus *bus;
+        I2CBus *controlBus;
         int address;
+        uint16_t control = 1;
+        const int kControlAddress = 0x20;
+
+        int readPosition();
 
         void move(int pos);
 
-        void home();
+        void home(int cal);
+
+        bool readControl();
     };
 
     class DynastatSensor : public AbstractSensor {
     public:
-        DynastatSensor(I2CBus *bus, uint16_t address, uint mode, uint registry, unsigned short rows, unsigned short cols,
+        DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, unsigned short rows, unsigned short cols,
                        unsigned short zero_value, unsigned short half_value, unsigned short full_value);
-
-        ~DynastatSensor();
 
         unsigned int getValue(int row, int col);
 
     private:
-        uint16_t *buffer;
-        size_t length;
+        const int kModeSingle = 1;
+        const int kModeDual = 2;
+        static const int kBank1 = 0x0100;
+        static const int kBank1Cols = 16;
+        static const int kBank2Cols = 8;
+        static const int kRows = 16;
+        static const int kCols = 24;
+        const uint16_t REG_MODE = 0x01;
+
+        int oCols;
+        int oRows;
+
+        uint8_t *buffer = new uint8_t[2];
+
+        int firstReg;
         I2CBus *bus;
     };
 
