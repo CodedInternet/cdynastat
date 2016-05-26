@@ -185,9 +185,6 @@ namespace dynastat {
         int reg = kBank1 + ((oRows + row) * kCols + col + oCols);
         bus->getRaw(address, reg, buffer, 2);
         uint16_t val = buffer[1] << 8 | buffer[0];
-        if(row + col == 0) {
-            std::cout << val << std::endl;
-        }
         return scaleValue(val);
     }
 
