@@ -3,6 +3,9 @@ project(cdynastat)
 include(DownloadProject.cmake)
 enable_testing()
 add_definitions(-DWEBRTC_POSIX)
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
+
 # https://github.com/Crascit/DownloadProject/blob/master/CMakeLists.txt
 if (CMAKE_VERSION VERSION_LESS 3.2)
     set(UPDATE_DISCONNECTED_IF_AVAILABLE "")
@@ -56,7 +59,8 @@ IF ( Boost_FOUND )
     MESSAGE( STATUS " Boost_LIBRARIES: " ${Boost_LIBRARIES} )
 ENDIF ( Boost_FOUND )
 
-
+MESSAGE ( STATUS "Searing for yaml-cpp")
+FIND_PACKAGE( YamlCpp REQUIRED )
 
 # Project includes
 link_directories(lib)
