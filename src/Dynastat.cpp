@@ -198,8 +198,7 @@ namespace dynastat {
 
         int reg = (oRows + row) * kCols + col + oCols;
         lock.lock();
-        uint16_t *ptr = (uint16_t *) buffer;
-        uint16_t val = ptr[reg];
+        uint16_t val = vals[reg];
         lock.unlock();
         return scaleValue(val);
     }

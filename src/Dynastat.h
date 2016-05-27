@@ -92,6 +92,7 @@ namespace dynastat {
 
         int length = kRows * kCols * sizeof(uint16_t);
         uint8_t *buffer = new uint8_t[length];
+        uint16_t *vals = (uint16_t *) buffer;
         bool running = true;
         boost::thread *worker;
         std::mutex lock;
