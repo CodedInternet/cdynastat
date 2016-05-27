@@ -70,8 +70,10 @@ namespace dynastat {
 
     class DynastatSensor : public AbstractSensor {
     public:
-        DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, unsigned short rows, unsigned short cols,
+        DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, bool mirror, unsigned short rows, unsigned short cols,
                        unsigned short zero_value, unsigned short half_value, unsigned short full_value);
+
+        ~DynastatSensor();
 
         unsigned int getValue(int row, int col);
 
@@ -88,10 +90,16 @@ namespace dynastat {
         int oCols;
         int oRows;
 
-        uint8_t *buffer = new uint8_t[2];
+        int length = kRows * kCols * sizeof(uint16_t);
+        uint8_t *buffer = new uint8_t[length];
+        bool running = true;
+        boost::thread *worker;
+        std::mutex lock;
 
-        int firstReg;
         I2CBus *bus;
+        bool mirror;
+
+        void update();
     };
 
     class Dynastat : public AbstractDynastat {

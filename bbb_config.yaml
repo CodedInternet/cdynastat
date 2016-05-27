@@ -11,6 +11,7 @@ sensors:
     address: 22
     mode: 2
     registry: 1
+    mirror: f
     rows: 10
     cols: 10
     zero_value: 0

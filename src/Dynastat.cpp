@@ -146,11 +146,12 @@ namespace dynastat {
         return (~value & control);
     };
 
-    DynastatSensor::DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, unsigned short rows,
+    DynastatSensor::DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, bool mirror, unsigned short rows,
                                    unsigned short cols, unsigned short zero_value, unsigned short half_value,
                                    unsigned short full_value) {
         this->address = address;
         this->bus = bus;
+        this->mirror = mirror;
         this->rows = rows;
         this->cols = cols;
 
@@ -178,15 +179,39 @@ namespace dynastat {
 
         setScale(zero_value, half_value, full_value);
 
-        fprintf(stdout, "Init sensor 0x%x.%d (%d, %d) in mode %d. Scale %f. \n", address, registry, rows, cols, mode,
+        worker = new boost::thread(boost::bind(&DynastatSensor::update, this));
+
+        fprintf(stdout, "Init sensor 0x%x.%d (%d, %d) in mode %d. Scale %f. \n", address, mirror, rows, cols, mode,
                 scale);
     }
 
+    DynastatSensor::~DynastatSensor() {
+        running = false;
+        worker->join();
+    }
+
     unsigned int DynastatSensor::getValue(int row, int col) {
-        int reg = kBank1 + ((oRows + row) * kCols + col + oCols);
-        bus->getRaw(address, reg, buffer, 2);
-        uint16_t val = buffer[1] << 8 | buffer[0];
+        if (mirror) {
+            row = rows - row;
+            col = cols - col;
+        }
+
+        int reg = (oRows + row) * kCols + col + oCols;
+        lock.lock();
+        uint16_t *ptr = (uint16_t *) buffer;
+        uint16_t val = ptr[reg];
+        lock.unlock();
         return scaleValue(val);
+    }
+
+    void DynastatSensor::update() {
+        while (running) {
+            lock.lock();
+            bus->getRaw(address, kBank1, buffer, length);
+            lock.unlock();
+
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+        }
     }
 
     Dynastat::Dynastat(YAML::Node config) {
@@ -199,50 +224,56 @@ namespace dynastat {
                 motorBus = new I2CBus(mBus);
 
                 YAML::Node motorConfig = config["motors"];
-                    for (YAML::const_iterator it = motorConfig.begin(); it != motorConfig.end(); ++it) {
-                        YAML::Node conf = it->second;
-                        if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
-                            std::cerr << "Cannot setup motor " << it->first.as<std::string>() << std::endl;
-                            continue;
-                        }
-
-                        RMCS220xMotor *motor = new RMCS220xMotor(
-                                motorBus,
-                                conf[kConfAddress].as<int>(),
-                                conf[kConfLow].as<int>(),
-                                conf[kConfHigh].as<int>(),
-                                conf[kConfCal].as<int>(),
-                                conf[kConfSpeed].as<int>(),
-                                conf[kConfDamping].as<int>(),
-                                conf[kConfControl].as<int>(),
-                                sensorBus
-                        );
-
-                        motors[it->first.as<std::string>()] = motor;
+                for (YAML::const_iterator it = motorConfig.begin(); it != motorConfig.end(); ++it) {
+                    YAML::Node conf = it->second;
+                    if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
+                        std::cerr << "Cannot setup motor " << it->first.as<std::string>() << std::endl;
+                        continue;
                     }
 
-                    YAML::Node sensorConfig = config["sensors"];
-                    for (YAML::const_iterator it = sensorConfig.begin(); it != sensorConfig.end(); ++it) {
-                        YAML::Node conf = it->second;
-                        if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
-                            std::cerr << "Cannot setup sensor " << it->first.as<std::string>() << std::endl;
-                            continue;
-                        }
+                    RMCS220xMotor *motor = new RMCS220xMotor(
+                            motorBus,
+                            conf[kConfAddress].as<int>(),
+                            conf[kConfLow].as<int>(),
+                            conf[kConfHigh].as<int>(),
+                            conf[kConfCal].as<int>(),
+                            conf[kConfSpeed].as<int>(),
+                            conf[kConfDamping].as<int>(),
+                            conf[kConfControl].as<int>(),
+                            sensorBus
+                    );
 
-                        DynastatSensor *sensor = new DynastatSensor(
-                                sensorBus,
-                                conf[kConfAddress].as<int>(),
-                                conf["mode"].as<uint>(),
-                                conf["registry"].as<uint>(),
-                                conf["rows"].as<unsigned short>(),
-                                conf["cols"].as<unsigned short>(),
-                                conf["zero_value"].as<unsigned short>(),
-                                conf["half_value"].as<unsigned short>(),
-                                conf["full_value"].as<unsigned short>()
-                        );
+                    motors[it->first.as<std::string>()] = motor;
+                }
 
-                        sensors[it->first.as<std::string>()] = sensor;
+                YAML::Node sensorConfig = config["sensors"];
+                for (YAML::const_iterator it = sensorConfig.begin(); it != sensorConfig.end(); ++it) {
+                    YAML::Node conf = it->second;
+                    if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
+                        std::cerr << "Cannot setup sensor " << it->first.as<std::string>() << std::endl;
+                        continue;
                     }
+
+                    DynastatSensor *sensor = new DynastatSensor(
+                            sensorBus,
+                            conf[kConfAddress].as<int>(),
+                            conf["mode"].as<uint>(),
+                            conf["registry"].as<uint>(),
+                            conf["mirror"].as<bool>(false),
+                    conf["rows"].as < unsigned
+                    short > (),
+                            conf["cols"].as < unsigned
+                    short > (),
+                            conf["zero_value"].as < unsigned
+                    short > (),
+                            conf["half_value"].as < unsigned
+                    short > (),
+                            conf["full_value"].as < unsigned
+                    short > ()
+                    );
+
+                    sensors[it->first.as<std::string>()] = sensor;
+                }
             }
                 break;
 
