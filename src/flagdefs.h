@@ -30,4 +30,6 @@ DEFINE_bool(autocall, false, "Call the first available other client on "
     "the server without user intervention.  Note: this flag should only be set "
     "to true on one of the two clients.");
 
+static const char CONFIG_FILE[] = "bbb_config.yaml";
+
 #endif  // CDYNASTAT_FLAGDEFS_H_

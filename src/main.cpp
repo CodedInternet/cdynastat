@@ -9,6 +9,7 @@
 //#include "DynastatSimulator.h"
 #include "PeerConnectionClient.h"
 
+#include <yaml-cpp/yaml.h>
 
 int main(int argc, char *argv[]) {
     rtc::FlagList::SetFlagsFromCommandLine(&argc, argv, true);
@@ -17,29 +18,17 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    Json::Value root;
-    Json::Reader reader;
-    std::ifstream config_doc("bbb_config.json", std::ifstream::binary);
-    if (!config_doc.is_open()) {
-        std::cerr << "Error opening config file" << std::endl;
-        return 1;
-    }
+    YAML::Node config = YAML::LoadFile(CONFIG_FILE);
 
-    bool configOk = reader.parse(config_doc, root, false);
-    if (!configOk) {
-        std::cerr << "Could not parse config file";
-        return 1;
-    }
-
-    std::shared_ptr<dynastat::Dynastat> device = std::make_shared<dynastat::Dynastat>(root);
+    std::shared_ptr<dynastat::Dynastat> device = std::make_shared<dynastat::Dynastat>(config);
 
     std::shared_ptr<dynastat::PeerConnectionClient> connectionClient = std::make_shared<dynastat::PeerConnectionClient>();
     dynastat::ConductorFactory* conductorFactory = new dynastat::ConductorFactory(connectionClient, device);
 
-    const Json::Value signaingServers = root["signaling_servers"];
-    for (Json::ValueIterator itr = signaingServers.begin(); itr != signaingServers.end(); itr++) {
-        Json::Value server = signaingServers[itr.index()];
-        int id = connectionClient->connect(server.asString());
+    const YAML::Node signalingServers = config["signaling_servers"];
+    assert(signalingServers.IsSequence());
+    for(int i = 0; i < signalingServers.size(); ++i) {
+        int id = connectionClient->connect(signalingServers[i].as<std::string>());
         connectionClient->add_listener(id, conductorFactory);
     }
 

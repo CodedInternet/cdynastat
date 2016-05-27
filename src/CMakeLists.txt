@@ -9,7 +9,7 @@ add_library(PeerConnectionClient PeerConnectionClient.cpp)
 target_link_libraries(PeerConnectionClient ${OPENSSL_LIBRARIES} ssl crypto)
 
 add_library(WebRTCConductor conductor.cpp conductor.h)
-target_link_libraries(WebRTCConductor ${OPENSSL_LIBRARIES} ${LIBWEBRTC} ${X11_LIBRARIES})
+target_link_libraries(WebRTCConductor ${OPENSSL_LIBRARIES} ${LIBWEBRTC} ${X11_LIBRARIES} ${YAMLCPP_LIBRARY_RELEASE})
 
 add_executable(cdynastat main.cpp)
 target_link_libraries(cdynastat dl pthread WebRTCConductor Dynastat PeerConnectionClient)

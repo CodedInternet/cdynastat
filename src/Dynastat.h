@@ -7,6 +7,7 @@
 
 #include <json/reader.h>
 #include <mutex>
+#include <yaml-cpp/yaml.h>
 
 #include "AbstractDynastat.h"
 
@@ -99,7 +100,7 @@ namespace dynastat {
         I2CBus *sensorBus;
         I2CBus *motorBus;
 
-        Dynastat(Json::Value &config);
+        Dynastat(YAML::Node config);
     };
 }
 
