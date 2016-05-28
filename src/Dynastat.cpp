@@ -192,8 +192,8 @@ namespace dynastat {
 
     unsigned int DynastatSensor::getValue(int row, int col) {
         if (mirror) {
-            row = rows - row;
-            col = cols - col;
+            row = (rows - 1) - row;
+            col = (cols - 1) - col;
         }
 
         int reg = (oRows + row) * kCols + col + oCols;
@@ -259,7 +259,7 @@ namespace dynastat {
                             conf["mode"].as<uint>(),
                             conf["registry"].as<uint>(),
                             conf["mirror"].as<bool>(false),
-                    conf["rows"].as < unsigned
+                            conf["rows"].as < unsigned
                     short > (),
                             conf["cols"].as < unsigned
                     short > (),

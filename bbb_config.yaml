@@ -7,13 +7,23 @@ i2c_bus:
   sensor: 1
 motors: {}
 sensors:
-  left_heel:
+  left_mtp:
     address: 22
-    mode: 2
+    mode: 1
     registry: 1
-    mirror: f
+    mirror: y
     rows: 10
-    cols: 10
+    cols: 16
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+  left_hallux:
+    address: 22
+    mode: 1
+    registry: 2
+    mirror: y
+    rows: 12
+    cols: 6
     zero_value: 0
     half_value: 2047
     full_value: 4095
