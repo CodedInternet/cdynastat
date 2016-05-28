@@ -110,7 +110,7 @@ namespace dynastat {
         const char *kConfDamping = "damping";
         const char *kConfControl = "control";
 
-        const int framerate = 12;
+        const int framerate = 15;
 
     protected:
         virtual void clientNotifier();

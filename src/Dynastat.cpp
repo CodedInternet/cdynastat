@@ -146,21 +146,49 @@ namespace dynastat {
         return (~value & control);
     };
 
-    DynastatSensor::DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, bool mirror, unsigned short rows,
-                                   unsigned short cols, unsigned short zero_value, unsigned short half_value,
-                                   unsigned short full_value) {
+    SensorBoard::SensorBoard(I2CBus *bus, int address, uint mode) {
         this->address = address;
         this->bus = bus;
-        this->mirror = mirror;
-        this->rows = rows;
-        this->cols = cols;
 
         // Check the sensor ID is correct before we do anything
         bus->get(address, 0x00, buffer, 2);
         assert((buffer[1] << 8 | buffer[0]) == 0xFE01);
 
-        buffer[0] = mode;
+        buffer[0] = (uint8_t) mode;
         bus->put(address, REG_MODE, buffer, 1);
+
+        worker = new boost::thread(boost::bind(&SensorBoard::update, this));
+    }
+
+    SensorBoard::~SensorBoard() {
+        running = false;
+        worker->join();
+    }
+
+    uint16_t SensorBoard::getValue(int reg) {
+        lock.lock();
+        uint16_t val = vals[reg];
+        lock.unlock();
+        return val;
+    }
+
+    void SensorBoard::update() {
+        while (running) {
+            lock.lock();
+            bus->getRaw(address, REG_VALUES, buffer, length);
+            lock.unlock();
+
+            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+        }
+    }
+
+    DynastatSensor::DynastatSensor(SensorBoard *board, uint registry, bool mirror, unsigned short rows,
+                                   unsigned short cols, unsigned short zero_value, unsigned short half_value,
+                                   unsigned short full_value) {
+        this->board = board;
+        this->mirror = mirror;
+        this->rows = rows;
+        this->cols = cols;
 
         // calculate mapping offsets needed
         switch (registry) {
@@ -178,16 +206,6 @@ namespace dynastat {
         oRows = (kRows - rows) / 2;
 
         setScale(zero_value, half_value, full_value);
-
-        worker = new boost::thread(boost::bind(&DynastatSensor::update, this));
-
-        fprintf(stdout, "Init sensor 0x%x.%d (%d, %d) in mode %d. Scale %f. \n", address, mirror, rows, cols, mode,
-                scale);
-    }
-
-    DynastatSensor::~DynastatSensor() {
-        running = false;
-        worker->join();
     }
 
     unsigned int DynastatSensor::getValue(int row, int col) {
@@ -196,21 +214,12 @@ namespace dynastat {
             col = (cols - 1) - col;
         }
 
-        int reg = (oRows + row) * kCols + col + oCols;
-        lock.lock();
-        uint16_t val = vals[reg];
-        lock.unlock();
+        row += oRows;
+        col += oCols;
+
+        int reg = row * kCols + col;
+        uint16_t val = board->getValue(reg);
         return scaleValue(val);
-    }
-
-    void DynastatSensor::update() {
-        while (running) {
-            lock.lock();
-            bus->getRaw(address, kBank1, buffer, length);
-            lock.unlock();
-
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-        }
     }
 
     Dynastat::Dynastat(YAML::Node config) {
@@ -253,10 +262,16 @@ namespace dynastat {
                         continue;
                     }
 
+                    SensorBoard *board;
+                    try {
+                        board = sensorBoards.at(conf[kConfAddress].as<int>());
+                    } catch (std::out_of_range) {
+                        board = new SensorBoard(sensorBus, conf[kConfAddress].as<int>(), conf["mode"].as<uint>());
+                        sensorBoards[conf[kConfAddress].as<int>()] = board;
+                    }
+
                     DynastatSensor *sensor = new DynastatSensor(
-                            sensorBus,
-                            conf[kConfAddress].as<int>(),
-                            conf["mode"].as<uint>(),
+                            board,
                             conf["registry"].as<uint>(),
                             conf["mirror"].as<bool>(false),
                             conf["rows"].as < unsigned

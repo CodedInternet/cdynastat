@@ -68,39 +68,51 @@ namespace dynastat {
         bool readControl();
     };
 
-    class DynastatSensor : public AbstractSensor {
+    class SensorBoard {
     public:
-        DynastatSensor(I2CBus *bus, int address, uint mode, uint registry, bool mirror, unsigned short rows, unsigned short cols,
-                       unsigned short zero_value, unsigned short half_value, unsigned short full_value);
+        SensorBoard(I2CBus *bus, int address, uint mode);
 
-        ~DynastatSensor();
+        ~SensorBoard();
 
-        unsigned int getValue(int row, int col);
+        uint16_t getValue(int reg);
 
     private:
-        const int kModeSingle = 1;
-        const int kModeDual = 2;
-        static const int kBank1 = 0x0100;
-        static const int kBank1Cols = 16;
-        static const int kBank2Cols = 8;
-        static const int kRows = 16;
-        static const int kCols = 24;
-        const uint16_t REG_MODE = 0x01;
-
-        int oCols;
-        int oRows;
-
-        int length = kRows * kCols * sizeof(uint16_t);
-        uint8_t *buffer = new uint8_t[length];
-        uint16_t *vals = (uint16_t *) buffer;
+        int address;
+        I2CBus *bus;
         bool running = true;
         boost::thread *worker;
         std::mutex lock;
 
-        I2CBus *bus;
-        bool mirror;
+        static const uint16_t REG_MODE = 0x01;
+        static const int REG_VALUES = 0x0100;
+        static const int kRows = 16;
+        static const int kCols = 24;
+
+        int length = kRows * kCols * sizeof(uint16_t);
+        uint8_t *buffer = new uint8_t[length];
+        uint16_t *vals = (uint16_t *) buffer;
 
         void update();
+    };
+
+    class DynastatSensor : public AbstractSensor {
+    public:
+        DynastatSensor(SensorBoard *board, uint registry, bool mirror, unsigned short rows, unsigned short cols,
+                       unsigned short zero_value, unsigned short half_value, unsigned short full_value);
+
+        unsigned int getValue(int row, int col);
+
+    private:
+        static const int kBank1Cols = 16;
+        static const int kBank2Cols = 8;
+        static const int kRows = 16;
+        static const int kCols = 24;
+
+        int oCols;
+        int oRows;
+
+        SensorBoard *board;
+        bool mirror;
     };
 
     class Dynastat : public AbstractDynastat {
@@ -110,6 +122,9 @@ namespace dynastat {
         I2CBus *motorBus;
 
         Dynastat(YAML::Node config);
+
+    private:
+        std::map<int, SensorBoard *> sensorBoards;
     };
 }
 
