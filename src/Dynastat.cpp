@@ -71,6 +71,8 @@ namespace dynastat {
         this->rawHigh = rawHigh;
         this->controlBus = controlBus;
 
+        printf("Motor %x: S%d \t D%d\n", address, speed, damping);
+
         uint8_t b[2];
         b[0] = (uint8_t) (speed & 0xff);
         b[1] = (uint8_t) (speed >> 8);

@@ -7,19 +7,19 @@ i2c_bus:
   sensor: 1
 motors:
   right_first_ray:
-     address: 0x24
-     cal: 700
-     low: 450
-     high: 0
-     speed: 50
-     damping: 127
-     control: 1
-  right_front_tilt:
+    address: 0x24
+    cal: 700
+    low: 450
+    high: 0
+    speed: 30
+    damping: 127
+    control: 1
+  right_forefoot_frontal:
     address: 0x23
     cal: 420
     low: -350
     high: 350
-    speed: 100
+    speed: 50
     damping: 255
     control: 2
 #  right_foot_size:
@@ -30,62 +30,73 @@ motors:
 #    speed: 255
 #    damping: 127
 #    control: 7
-#  right_rear_tilt:
-#    address: 0x21
-#    cal: -260
-#    low: -240
-#    high: 240
-#    speed: 100
-#    damping: 127
-#    control: 5
+  right_rearfoot_frontal:
+    address: 0x21
+    cal: -260
+    low: -240
+    high: 240
+    speed: 200
+    damping: 255
+    control: 5
 sensors:
-#  left_heel:
-#    address: 0x16
-#    mode: 2
-#    registry: 1
-#    mirror: n
-#    rows: 12
-#    cols: 12
-#    zero_value: 0
-#    half_value: 2047
-#    full_value: 4095
-#  left_mtp:
-#    address: 0x16 #temp
-#    mode: 1
-#    registry: 1
-#    mirror: y
-#    rows: 10
-#    cols: 16
-#    zero_value: 0
-#    half_value: 2047
-#    full_value: 4095
-#  right_heel:
-#    address: 0x25
-#    mode: 2
-#    registry: 1
-#    mirror: n
-#    rows: 12
-#    cols: 12
-#    zero_value: 0
-#    half_value: 2047
-#    full_value: 4095
-#  right_mtp:
-#    address: 0x26
-#    mode: 1
-#    registry: 1
-#    mirror: y
-#    rows: 10
-#    cols: 16
-#    zero_value: 0
-#    half_value: 2047
-#    full_value: 4095
-#  right_hallux:
-#    address: 0x26
-#    mode: 1
-#    registry: 2
-#    mirror: y
-#    rows: 12
-#    cols: 6
-#    zero_value: 0
-#    half_value: 2047
-#    full_value: 4095
+  left_heel:
+    address: 0x21
+    mode: 2
+    registry: 1
+    mirror: y
+    rows: 12
+    cols: 12
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+  left_mtp:
+    address: 0x16 #temp
+    mode: 1
+    registry: 1
+    mirror: y
+    rows: 10
+    cols: 16
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+  left_hallux:
+    address: 0x16
+    mode: 1
+    registry: 2
+    mirror: y
+    rows: 12
+    cols: 6
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+
+  right_heel:
+    address: 0x25
+    mode: 2
+    registry: 1
+    mirror: n
+    rows: 12
+    cols: 12
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+  right_mtp:
+    address: 0x26
+    mode: 1
+    registry: 1
+    mirror: n
+    rows: 10
+    cols: 16
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
+  right_hallux:
+    address: 0x26
+    mode: 1
+    registry: 2
+    mirror: n
+    rows: 12
+    cols: 6
+    zero_value: 0
+    half_value: 2047
+    full_value: 4095
