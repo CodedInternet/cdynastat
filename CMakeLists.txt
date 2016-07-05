@@ -90,6 +90,14 @@ download_project(PROJ googletest
 
 add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
 
+# msgpack DownloadProject
+download_project(PROJ msgpack
+        GIT_REPOSITORY https://github.com/msgpack/msgpack-c.git
+        GIT_TAG cpp-2.0.0
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+add_subdirectory(${msgpack_SOURCE_DIR} ${msgpack_BINARY_DIR} EXCLUDE_FROM_ALL)
+
 # When using CMake 2.8.11 or later, header path dependencies
 # are automatically added to the gtest and gmock targets.
 # For earlier CMake versions, we have to explicitly add the

@@ -16,8 +16,8 @@ target_link_libraries(cdynastat dl pthread WebRTCConductor Dynastat PeerConnecti
 
 add_executable(ByteTest ByteTest.cpp)
 
-add_executable(ControlTest ControlTest.cpp)
-target_link_libraries(ControlTest Dynastat)
+#add_executable(ControlTest ControlTest.cpp)
+#target_link_libraries(ControlTest Dynastat)
 
 #add_executable(websocketpp_debug_client websocketpp_debug_client.cpp)
 #target_link_libraries(websocketpp_debug_client ${OPENSSL_LIBRARIES} ssl crypto )
