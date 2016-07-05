@@ -5,15 +5,15 @@
 #ifndef CDYNASTAT_DYNASTATSIMULATOR_H
 #define CDYNASTAT_DYNASTATSIMULATOR_H
 
-#include <json/value.h>
-#include <boost/thread/thread.hpp>
 #include "AbstractDynastat.h"
+#include <boost/thread/thread.hpp>
 #include <mutex>
+#include <yaml-cpp/yaml.h>
 
 namespace dynastat {
-    class DynastatSimulator : public AbstractDynastat {
+    class Dynastat : public AbstractDynastat {
     public:
-        DynastatSimulator(Json::Value &config);
+        Dynastat(YAML::Node config);
     };
 
     class SimulatedMotor : public AbstractMotor {
@@ -46,8 +46,8 @@ namespace dynastat {
 
         void updateValue();
 
-        SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols, unsigned short zeroValue,
-                        unsigned short halfValue, unsigned short fullValue);
+        SimulatedSensor(uint registry, bool mirror, unsigned short rows, unsigned short cols,
+                                unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue);
 
         ~SimulatedSensor();
 

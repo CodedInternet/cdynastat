@@ -5,6 +5,9 @@ target_link_libraries(AbstractDynastat ${LIBWEBRTC})
 add_library(Dynastat Dynastat.cpp)
 target_link_libraries(Dynastat AbstractDynastat)
 
+add_library(DynastatSimulator DynastatSimulator.cpp)
+target_link_libraries(DynastatSimulator AbstractDynastat)
+
 add_library(PeerConnectionClient PeerConnectionClient.cpp)
 target_link_libraries(PeerConnectionClient ${OPENSSL_LIBRARIES} ssl crypto)
 
@@ -13,6 +16,10 @@ target_link_libraries(WebRTCConductor ${OPENSSL_LIBRARIES} ${LIBWEBRTC} ${X11_LI
 
 add_executable(cdynastat main.cpp)
 target_link_libraries(cdynastat dl pthread WebRTCConductor Dynastat PeerConnectionClient)
+
+add_definitions(-DSIMULATOR)
+add_executable(simulator main.cpp)
+target_link_libraries(simulator dl pthread WebRTCConductor DynastatSimulator PeerConnectionClient)
 
 add_executable(ByteTest ByteTest.cpp)
 

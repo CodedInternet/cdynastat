@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
     // Set 16x10 mode.
     buffer[0] = 0x00;
     buffer[1] = 0x01;
-    //buffer[2] = 0x00;		// 1:1 mapping
+//    buffer[2] = 0x00;		// 1:1 mapping
 //    buffer[2] = 0x01;		// 16x10 and 6x12
     buffer[2] = 0x02;		// 12x12
     write(fd, buffer, 3);

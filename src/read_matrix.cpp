@@ -53,9 +53,9 @@ int main (int argc, char *argv[])
     //buffer[2] = 0x00;		// 1:1 mapping
 //    buffer[2] = 0x01;		// 16x10 and 6x12
     buffer[2] = 0x02;		// 12x12
-//    write(fd, buffer, 3);
-    buffer[0] = 0x02;
-    i2c_smbus_write_i2c_block_data(fd, 0x001, 1, buffer);
+    write(fd, buffer, 3);
+//    buffer[0] = 0x02;
+//    i2c_smbus_write_i2c_block_data(fd, 0x001, 1, buffer);
 
 
     // Set the start address.
@@ -81,25 +81,42 @@ int main (int argc, char *argv[])
 
     printf(" ----------------------------------------------------------------- ---------------------------------\n");
     printf("|");
-    for (i=0, j=1; i<length/2; ++i, ++j)
-    {
-        if (*ptr == 0)
-        {
-            ptr++;
-            printf("    ");
-        }
-        else
-            printf("%03X ", *ptr++);
-        if ((i+1) % 24 == 0)
-        {
-            j = 0;
-            printf("|\n|");
-        }
+//    for (i=0, j=1; i<length/2; ++i, ++j)
+//    {
+//        if (*ptr == 0)
+//        {
+//            ptr++;
+//            printf("    ");
+//        }
+//        else
+//            printf("%03X ", *ptr++);
+//        if ((i+1) % 24 == 0)
+//        {
+//            j = 0;
+//            printf("|\n|");
+//        }
+//
+//        if (j == 16)
+//        {
+//            printf(" | ");
+//        }
+//    }
+    for(int r = 0; r < 16; ++r) {
+        for(int c = 0; c < 24; ++c) {
+            i = (r*24)+c;
+            val = ptr[i];
 
-        if (j == 16)
-        {
-            printf(" | ");
+            if(val == 0) {
+                printf("    ");
+            } else {
+                printf("%03X ", val);
+            }
+
+            if(c == 16) {
+                printf(" | ");
+            }
         }
+        printf("|\n|");
     }
     printf("----------------------------------------------------------------- ---------------------------------\n");
     printf("\n");

@@ -2,11 +2,15 @@
 
 #include <iostream>
 #include <fstream>
-#include <json/reader.h>
 
 #include "conductor.h"
+
+#ifndef SIMULATOR
 #include "Dynastat.h"
-//#include "DynastatSimulator.h"
+#else
+#include "DynastatSimulator.h"
+#endif
+
 #include "PeerConnectionClient.h"
 
 #include <yaml-cpp/yaml.h>

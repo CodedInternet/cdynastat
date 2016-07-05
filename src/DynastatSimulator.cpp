@@ -1,55 +1,55 @@
 //
 // Created by Tom Price on 17/12/2015.
 //
-#include <boost/random.hpp>
-
 #include "DynastatSimulator.h"
+
+#include <boost/random.hpp>
 
 namespace dynastat {
 
-    DynastatSimulator::DynastatSimulator(Json::Value &config) {
-        switch (config.get("version", 0).asInt()) {
+    Dynastat::Dynastat(YAML::Node config) {
+        switch (config["version"].as<int>()) {
             case 1: {
                 // setup sensors
-                const Json::Value sensorConfig = config[kConfSensors];
-                for (Json::ValueIterator itr = sensorConfig.begin(); itr != sensorConfig.end(); itr++) {
-                    std::string name = itr.key().asString();
-                    const Json::Value conf = sensorConfig[name];
-                    if (conf == false or !conf.get(kConfBaseAddress, 0).asInt()) {
+                YAML::Node sensorConfig = config["sensors"];
+                for (YAML::const_iterator it = sensorConfig.begin(); it != sensorConfig.end(); ++it) {
+                    YAML::Node conf = it->second;
+                    if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
+                        std::cerr << "Cannot setup sensor " << it->first.as<std::string>() << std::endl;
                         continue;
                     }
 
-                    const unsigned short rows = (const unsigned short) conf[kConfRows].asUInt();
-                    const unsigned short cols = (const unsigned short) conf[kConfCols].asUInt();
-                    const unsigned short zeroValue = (const unsigned short) conf[kConfZeroValue].asUInt();
-                    const unsigned short halfValue = (const unsigned short) conf[kConfHalfValue].asUInt();
-                    const unsigned short fullValue = (const unsigned short) conf[kConfFullValue].asUInt();
-                    const unsigned short baseAddress = (const unsigned short) conf[kConfBaseAddress].asUInt();
+                    SimulatedSensor *sensor = new SimulatedSensor(
+                            conf["registry"].as<uint>(),
+                            conf["mirror"].as<bool>(false),
+                            conf["rows"].as < unsigned short > (),
+                            conf["cols"].as < unsigned short > (),
+                            conf["zero_value"].as < unsigned short > (),
+                            conf["half_value"].as < unsigned short > (),
+                            conf["full_value"].as < unsigned short > ()
+                    );
 
-                    SimulatedSensor *sensor = new SimulatedSensor(baseAddress, rows, cols, zeroValue, halfValue,
-                                                                  fullValue);
-
-                    sensors[name] = sensor;
+                    sensors[it->first.as<std::string>()] = sensor;
                 }
                 // setup motors
 
-                const Json::Value motorConfig = config[kConfMotors];
-                for (Json::ValueIterator itr = motorConfig.begin(); itr != motorConfig.end(); itr++) {
-                    std::string name = itr.key().asString();
-                    const Json::Value conf = motorConfig[name];
-                    if (conf == false or !conf.get(kConfAddress, 0).asInt()) {
+                YAML::Node motorConfig = config["motors"];
+                for (YAML::const_iterator it = motorConfig.begin(); it != motorConfig.end(); ++it) {
+                    YAML::Node conf = it->second;
+                    if (!conf[kConfAddress].IsDefined() && conf[kConfAddress].as<int>() <= 0) {
+                        std::cerr << "Cannot setup motor " << it->first.as<std::string>() << std::endl;
                         continue;
                     }
 
-                    const unsigned short address = (const unsigned short) conf[kConfAddress].asUInt();
-                    const int32_t cal = conf[kConfCal].asInt();
-                    const int32_t low = conf[kConfLow].asInt();
-                    const int32_t high = conf[kConfHigh].asInt();
-                    const int16_t speed = (const int16_t) conf[kConfSpeed].asInt();
-                    const int16_t damping = (const int16_t) conf[kConfDamping].asInt();
-
-                    SimulatedMotor *motor = new SimulatedMotor(address, cal, low, high, speed, damping);
-                    motors[name] = motor;
+                    SimulatedMotor *motor = new SimulatedMotor(
+                            conf[kConfAddress].as<int>(),
+                            conf[kConfCal].as<int>(),
+                            conf[kConfLow].as<int>(),
+                            conf[kConfHigh].as<int>(),
+                            conf[kConfSpeed].as<int>(),
+                            conf[kConfDamping].as<int>()
+                    );
+                    motors[it->first.as<std::string>()] = motor;
                 }
                 break;
 
@@ -66,10 +66,8 @@ namespace dynastat {
         targetPosition = scalePos(position);
     }
 
-    SimulatedSensor::SimulatedSensor(unsigned short address, unsigned short rows, unsigned short cols,
-                                     unsigned short zeroValue,
-                                     unsigned short halfValue,
-                                     unsigned short fullValue) {
+    SimulatedSensor::SimulatedSensor(uint registry, bool mirror, unsigned short rows, unsigned short cols,
+                                     unsigned short zeroValue, unsigned short halfValue, unsigned short fullValue) {
         this->rows = rows;
         this->cols = cols;
         this->zeroValue = zeroValue;
