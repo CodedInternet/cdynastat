@@ -6,10 +6,8 @@
 #define CDYNASTAT_DYNASTATINTERFACE_H
 
 
-#include <iostream>
 #include <string>
 #include <map>
-#include <json/value.h>
 #include <msgpack.hpp>
 #include <boost/thread/thread.hpp>
 

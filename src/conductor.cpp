@@ -5,9 +5,6 @@
 #include "conductor.h"
 
 #include <boost/thread.hpp>
-#include <json/reader.h>
-#include <json/writer.h>
-#include "webrtc/base/json.h"
 #include "talk/app/webrtc/test/fakeconstraints.h"
 
 namespace dynastat {
@@ -32,10 +29,10 @@ namespace dynastat {
         data_channel->RegisterObserver(this);
         std::string label = data_channel->label();
 
-        if (label == "data") {
+        if (label == kChannelDataName) {
             this->m_tx = data_channel;
             this->m_device->addClient(this);
-        } else if (label == "control") {
+        } else if (label == kChannelControlName) {
             this->m_rx = data_channel;
         }
     }
@@ -82,13 +79,13 @@ namespace dynastat {
             return;
         }
 
-        if (jmessage["cmd"] == "set_motor") {
-            std::string name = jmessage["name"].asString();
-            int value = jmessage["value"].asInt();
+        if (jmessage[kMsgCmdKey] == kMsgSetMotor) {
+            std::string name = jmessage[kMsgNameKey].asString();
+            int value = jmessage[kMsgValueKey].asInt();
             try {
                 m_device->setMotor(name, value);
             } catch (std::out_of_range) {
-                std::cerr << "Unkown motor: " << name << std::endl;
+                std::cerr << "Unknown motor: " << name << std::endl;
                 return;
             } catch (std::invalid_argument) {
                 std::cerr << "Unacceptable argument" << std::endl;
@@ -104,8 +101,8 @@ namespace dynastat {
 
             Json::StyledWriter writer;
             Json::Value answer;
-            answer["type"] = "answer";
-            answer["sdp"] = sdp;
+            answer[kSessionDescriptionTypeName] = kSessionAnswerName;
+            answer[kSessionDescriptionSdpName] = sdp;
 
             m_connectionClient->send(m_connectionClientId, writer.write(answer));
         }
@@ -119,7 +116,7 @@ namespace dynastat {
             return;
         }
 
-        if (jmessage.get("type", 0) == webrtc::SessionDescriptionInterface::kOffer) {
+        if (jmessage.get(kSessionDescriptionTypeName, 0) == webrtc::SessionDescriptionInterface::kOffer) {
             OnOffer(jmessage, con_id);
         }
     }
@@ -139,7 +136,7 @@ namespace dynastat {
     void ConductorFactory::OnOffer(Json::Value offer, int con_id) {
         webrtc::SdpParseError error;
         webrtc::SessionDescriptionInterface *sessionDescription(
-                CreateSessionDescription(webrtc::SessionDescriptionInterface::kOffer, offer.get("sdp", 0).asString(),
+                CreateSessionDescription(webrtc::SessionDescriptionInterface::kOffer, offer.get(kSessionDescriptionSdpName, 0).asString(),
                                          &error));
         if (!sessionDescription) {
             std::cerr << "Can't parse received session description message. "

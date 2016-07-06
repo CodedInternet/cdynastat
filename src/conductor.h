@@ -7,12 +7,10 @@
 
 #define DTLS true
 
-#include <iostream>
-#include <queue>
-#include "webrtc/base/thread.h"
 #include "webrtc/base/scoped_ptr.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
 #include "talk/app/webrtc/peerconnection.h"
+#include "webrtc/base/json.h"
 #include "AbstractDynastat.h"
 #include "PeerConnectionClient.h"
 
@@ -25,6 +23,17 @@ namespace dynastat {
 // Names used for a SessionDescription JSON object.
     const char kSessionDescriptionTypeName[] = "type";
     const char kSessionDescriptionSdpName[] = "sdp";
+    const char kSessionAnswerName[] = "answer";
+
+    // Channel Names
+    const char kChannelDataName[] = "data";
+    const char kChannelControlName[] = "control";
+
+    // Incomming message paramters
+    const char kMsgCmdKey[] = "cmd";
+    const char kMsgSetMotor[] = "set_motor";
+    const char kMsgNameKey[] = "name";
+    const char kMsgValueKey[] = "value";
 
     class DummySetSessionDescriptionObserver
             : public webrtc::SetSessionDescriptionObserver {
@@ -101,7 +110,6 @@ namespace dynastat {
 
     private:
 
-//        rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection;
         rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;
         rtc::scoped_refptr<webrtc::DataChannelInterface> m_tx, m_rx;
         std::shared_ptr<dynastat::AbstractDynastat> m_device;
