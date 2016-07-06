@@ -53,9 +53,7 @@ namespace dynastat {
 
         virtual void setPosition(int pos) = 0;
 
-        virtual Json::Value getState();
-
-        virtual motorState readState();
+        virtual motorState getState();
 
     protected:
         const int bits = 8;
@@ -87,7 +85,7 @@ namespace dynastat {
 
         virtual std::map<std::string, AbstractSensor::sensorState> readSensors();
 
-        virtual Json::Value readMotors();
+        virtual std::map<std::string, AbstractMotor::motorState> readMotors();
 
         virtual int readMotor(std::string name);
 

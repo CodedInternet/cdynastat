@@ -150,26 +150,19 @@ namespace dynastat {
         }
     }
 
-    Json::Value AbstractMotor::getState() {
-        Json::Value json;
-        json["target"] = getPosition();
-        json["current"] = getCurrentPosition();
-        return json;
-    }
-
-    AbstractMotor::motorState AbstractMotor::readState() {
+    AbstractMotor::motorState AbstractMotor::getState() {
         motorState state;
         state["target"] = getPosition();
         state["current"] = getCurrentPosition();
         return state;
     };
 
-    Json::Value AbstractDynastat::readMotors() {
-        Json::Value result = Json::objectValue;
+    std::map<std::string, AbstractMotor::motorState> AbstractDynastat::readMotors() {
+        std::map<std::string, AbstractMotor::motorState> state;
         for (MotorMap::iterator it1 = motors.begin(); it1 != motors.end(); ++it1) {
-            result[it1->first] = it1->second->getState();
+            state[it1->first] = it1->second->getState();
         }
-        return result;
+        return state;
     }
 
     int AbstractMotor::getPosition() {

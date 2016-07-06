@@ -191,9 +191,11 @@ namespace dynastat {
 
         msgpack::sbuffer sbuf;
         msgpack::packer<msgpack::sbuffer> pk(&sbuf);
-        pk.pack_map(1);
+        pk.pack_map(2);
         pk.pack("sensors");
         pk.pack(m_device->readSensors());
+        pk.pack("motors");
+        pk.pack(m_device->readMotors());
         rtc::Buffer buffer(sbuf.data(), sbuf.size());
         webrtc::DataBuffer dataBuffer(buffer, true);
         m_tx->Send(dataBuffer);
