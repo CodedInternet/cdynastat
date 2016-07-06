@@ -85,8 +85,6 @@ namespace dynastat {
 
         virtual std::map<std::string, AbstractMotor::motorState> readMotors();
 
-        virtual int readMotor(std::string name);
-
         virtual void setMotor(std::string name, int pos);
 
         virtual void notifyClients();

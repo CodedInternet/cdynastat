@@ -15,12 +15,7 @@
 #include "PeerConnectionClient.h"
 
 namespace dynastat {
-    // Names used for a IceCandidate JSON object.
-    const char kCandidateSdpMidName[] = "sdpMid";
-    const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
-    const char kCandidateSdpName[] = "candidate";
-
-// Names used for a SessionDescription JSON object.
+    // Names used for a SessionDescription JSON object.
     const char kSessionDescriptionTypeName[] = "type";
     const char kSessionDescriptionSdpName[] = "sdp";
     const char kSessionAnswerName[] = "answer";
@@ -74,7 +69,7 @@ namespace dynastat {
 
         ~Conductor();
 
-        virtual void updateStatus();
+        void updateStatus();
 
         virtual void OnStateChange() override;
 
@@ -128,7 +123,7 @@ namespace dynastat {
         ~ConductorFactory() { };
 
     private:
-        virtual void on_message(int con_id, std::string msg);
+        void on_message(int con_id, std::string msg);
 
         void OnOffer(Json::Value offer, int con_id);
 

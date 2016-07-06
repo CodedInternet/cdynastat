@@ -7,11 +7,6 @@
 
 namespace dynastat {
 
-    int AbstractDynastat::readMotor(std::string name) {
-        AbstractMotor *motor = motors.at(name);
-        return motor->getPosition();
-    }
-
     void AbstractDynastat::setMotor(std::string name, int pos) {
         AbstractMotor *motor = motors.at(name);
         motor->setPosition(pos);
