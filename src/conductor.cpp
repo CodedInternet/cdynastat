@@ -183,12 +183,19 @@ namespace dynastat {
     }
 
     void Conductor::updateStatus() {
-        Json::Value json;
-        Json::FastWriter writer;
-        json["sensors"] = m_device->readSensors();
-        json["motors"] = m_device->readMotors();
-        webrtc::DataBuffer buffer(writer.write(json));
-        m_tx->Send(buffer);
+//        Json::Value json;
+//        Json::FastWriter writer;
+//        json["sensors"] = m_device->readSensors();
+//        json["motors"] = m_device->readMotors();
+//        webrtc::DataBuffer buffer(writer.write(json));
+
+        std::tuple<int, bool, std::string> src(1, true, "example");
+        msgpack::sbuffer sbuf;
+        msgpack::pack(sbuf, src);
+        rtc::Buffer buffer(sbuf.data(), sbuf.size());
+        webrtc::DataBuffer dataBuffer(buffer, true);
+        m_tx->Send(dataBuffer);
+        return;
     }
 
     Conductor::~Conductor() {

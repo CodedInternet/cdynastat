@@ -10,12 +10,15 @@
 #include <string>
 #include <map>
 #include <json/value.h>
+#include <msgpack.hpp>
 #include <boost/thread/thread.hpp>
 
 namespace dynastat {
 
     class AbstractSensor {
     public:
+        typedef std::vector<std::vector<int>> sensorState;
+
         AbstractSensor() { };
 
         virtual ~AbstractSensor() { };
@@ -25,6 +28,8 @@ namespace dynastat {
         virtual unsigned int getValue(int row, int col) = 0;
 
         virtual Json::Value readAll();
+
+        virtual sensorState getState();
 
     protected:
         virtual void setScale(uint16_t zeroValue, uint16_t halfValue, uint16_t fullValue);
@@ -41,6 +46,7 @@ namespace dynastat {
 
     class AbstractMotor {
     public:
+        typedef std::map<std::string, int> motorState;
 
         virtual ~AbstractMotor() = default;
 
@@ -51,6 +57,8 @@ namespace dynastat {
         virtual void setPosition(int pos) = 0;
 
         virtual Json::Value getState();
+
+        virtual motorState readState();
 
     protected:
         const int bits = 8;
@@ -80,7 +88,7 @@ namespace dynastat {
 
         virtual ~AbstractDynastat();
 
-        virtual Json::Value readSensors();
+        virtual std::map<std::string, AbstractSensor::sensorState> readSensors();
 
         virtual Json::Value readMotors();
 
@@ -110,7 +118,7 @@ namespace dynastat {
         const char *kConfDamping = "damping";
         const char *kConfControl = "control";
 
-        const int framerate = 15;
+        const int framerate = 2;
 
     protected:
         virtual void clientNotifier();

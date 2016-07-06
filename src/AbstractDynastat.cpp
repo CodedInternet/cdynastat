@@ -92,12 +92,12 @@ namespace dynastat {
         return scaled;
     }
 
-    Json::Value AbstractDynastat::readSensors() {
-        Json::Value result = Json::objectValue;
+    std::map<std::string, AbstractSensor::sensorState> AbstractDynastat::readSensors() {
+        std::map<std::string, AbstractSensor::sensorState> state;
         for (SensorMap::iterator it1 = sensors.begin(); it1 != sensors.end(); ++it1) {
-            result[it1->first] = it1->second->readAll();
+            state[it1->first] = it1->second->getState();
         }
-        return result;
+        return state;
     }
 
     Json::Value AbstractSensor::readAll() {
@@ -110,6 +110,16 @@ namespace dynastat {
             }
         }
         return result;
+    }
+
+    AbstractSensor::sensorState AbstractSensor::getState() {
+        sensorState state;
+        for (unsigned short row = 0; row < rows; ++row) {
+            for (unsigned short col = 0; col < cols; ++col) {
+                state[row][col] = getValue(row, col);
+            }
+        }
+        return state;
     }
 
     int AbstractSensor::getOffset(unsigned short row, unsigned short col) {
@@ -158,6 +168,13 @@ namespace dynastat {
         json["current"] = getCurrentPosition();
         return json;
     }
+
+    AbstractMotor::motorState AbstractMotor::readState() {
+        motorState state;
+        state["target"] = getPosition();
+        state["current"] = getCurrentPosition();
+        return state;
+    };
 
     Json::Value AbstractDynastat::readMotors() {
         Json::Value result = Json::objectValue;
