@@ -35,14 +35,10 @@ namespace dynastat {
     class RMCS220xMotor : public AbstractMotor {
 
     public:
-        virtual int getCurrentPosition() override {
-            return 0;
-        }
+        virtual int getCurrentPosition() override;
 
         RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
                               int control, I2CBus *controlBus);
-
-        virtual int getPosition();
 
         virtual void setPosition(int pos);
 

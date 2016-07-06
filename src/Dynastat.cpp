@@ -87,12 +87,12 @@ namespace dynastat {
         return;
     }
 
-    int RMCS220xMotor::getPosition() {
-        int pos = readPosition();
-        return scalePos(pos, false);
+    int RMCS220xMotor::getCurrentPosition() {
+        return scalePos(readPosition(), false);
     }
 
     void RMCS220xMotor::setPosition(int pos) {
+        position = pos;
         pos = scalePos(pos, true);
         move(pos);
         return;
@@ -180,7 +180,7 @@ namespace dynastat {
             bus->getRaw(address, REG_VALUES, buffer, length);
             lock.unlock();
 
-            boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / AbstractDynastat::framerate));
         }
     }
 
