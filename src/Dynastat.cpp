@@ -168,9 +168,9 @@ namespace dynastat {
     }
 
     uint16_t SensorBoard::getValue(int reg) {
-        lock.lock();
+//        lock.lock();
         uint16_t val = vals[reg];
-        lock.unlock();
+//        lock.unlock();
         return val;
     }
 

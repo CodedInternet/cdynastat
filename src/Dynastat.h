@@ -6,7 +6,6 @@
 #define CDYNASTAT_DYNASTAT_H
 
 #include <json/reader.h>
-#include <mutex>
 #include <yaml-cpp/yaml.h>
 
 #include "AbstractDynastat.h"
@@ -29,7 +28,7 @@ namespace dynastat {
 
         int fd;
 
-        std::mutex lock;
+        boost::mutex lock;
     };
 
     class RMCS220xMotor : public AbstractMotor {
@@ -77,7 +76,7 @@ namespace dynastat {
         I2CBus *bus;
         bool running = true;
         boost::thread *worker;
-        std::mutex lock;
+        boost::mutex lock;
 
         static const uint16_t REG_MODE = 0x01;
         static const int REG_VALUES = 0x0100;
