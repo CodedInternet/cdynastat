@@ -16,9 +16,9 @@ motors:
     control: 1
   right_forefoot_frontal:
     address: 0x23
-    cal: 420
-    low: -350
-    high: 350
+    cal: 362
+    low: -163
+    high: 182
     speed: 50
     damping: 255
     control: 2
@@ -33,8 +33,8 @@ motors:
   right_rearfoot_frontal:
     address: 0x21
     cal: -260
-    low: -240
-    high: 240
+    low: -163
+    high: 160
     speed: 200
     damping: 255
     control: 5
