@@ -100,7 +100,7 @@ namespace dynastat {
         DynastatSensor(SensorBoard *board, uint registry, bool mirror, unsigned short rows, unsigned short cols,
                        unsigned short zero_value, unsigned short half_value, unsigned short full_value);
 
-        unsigned int getValue(int row, int col);
+        virtual unsigned int getValue(int row, int col);
 
     private:
         static const int kBank1Cols = 16;
