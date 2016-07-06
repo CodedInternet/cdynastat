@@ -100,20 +100,8 @@ namespace dynastat {
         return state;
     }
 
-    Json::Value AbstractSensor::readAll() {
-        Json::Value result;
-        for (unsigned short row = 0; row < rows; ++row) {
-            result[row] = Json::Value(Json::arrayValue);
-            for (unsigned short col = 0; col < cols; ++col) {
-                result[row][col] = Json::Value();
-                result[row][col] = getValue(row, col);
-            }
-        }
-        return result;
-    }
-
     AbstractSensor::sensorState AbstractSensor::getState() {
-        sensorState state;
+        sensorState state = sensorState(rows, std::vector<int>(cols, 0));
         for (unsigned short row = 0; row < rows; ++row) {
             for (unsigned short col = 0; col < cols; ++col) {
                 state[row][col] = getValue(row, col);

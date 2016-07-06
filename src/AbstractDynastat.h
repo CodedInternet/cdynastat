@@ -27,8 +27,6 @@ namespace dynastat {
 
         virtual unsigned int getValue(int row, int col) = 0;
 
-        virtual Json::Value readAll();
-
         virtual sensorState getState();
 
     protected:
@@ -37,7 +35,6 @@ namespace dynastat {
         virtual int getOffset(unsigned short row, unsigned short col);
 
         const uint8_t bits = 8;
-        unsigned short address;
         unsigned short rows;
         unsigned short cols;
         unsigned short zeroValue;

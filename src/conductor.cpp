@@ -189,9 +189,11 @@ namespace dynastat {
 //        json["motors"] = m_device->readMotors();
 //        webrtc::DataBuffer buffer(writer.write(json));
 
-        std::tuple<int, bool, std::string> src(1, true, "example");
         msgpack::sbuffer sbuf;
-        msgpack::pack(sbuf, src);
+        msgpack::packer<msgpack::sbuffer> pk(&sbuf);
+        pk.pack_map(1);
+        pk.pack("sensors");
+        pk.pack(m_device->readSensors());
         rtc::Buffer buffer(sbuf.data(), sbuf.size());
         webrtc::DataBuffer dataBuffer(buffer, true);
         m_tx->Send(dataBuffer);
