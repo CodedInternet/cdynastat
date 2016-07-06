@@ -76,7 +76,6 @@ namespace dynastat {
         I2CBus *bus;
         bool running = true;
         boost::thread *worker;
-        boost::mutex lock;
 
         static const uint16_t REG_MODE = 0x01;
         static const int REG_VALUES = 0x0100;

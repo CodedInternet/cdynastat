@@ -168,17 +168,13 @@ namespace dynastat {
     }
 
     uint16_t SensorBoard::getValue(int reg) {
-//        lock.lock();
         uint16_t val = vals[reg];
-//        lock.unlock();
         return val;
     }
 
     void SensorBoard::update() {
         while (running) {
-            lock.lock();
             bus->getRaw(address, REG_VALUES, buffer, length);
-            lock.unlock();
 
             boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / AbstractDynastat::framerate));
         }
