@@ -23,6 +23,8 @@ namespace dynastat {
 
         void put(int i2caddr, uint16_t command, uint8_t *buffer, size_t length);
 
+        void putRaw(int i2caddr, uint16_t reg, uint8_t *buffer, size_t length);
+
     private:
         int connect(int i2caddr);
 

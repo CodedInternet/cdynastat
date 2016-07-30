@@ -56,6 +56,24 @@ namespace dynastat {
         lock.unlock();
     }
 
+    void I2CBus::putRaw(int i2caddr, uint16_t reg, uint8_t *buffer, size_t length) {
+        lock.lock();
+        connect(i2caddr);
+
+        uint8_t *command = new uint8_t[2 + length];
+
+        command[0] = (uint8_t) (reg >> 8 & 0xff);
+        command[1] = (uint8_t) (reg & 0xff);
+
+        for (int i = 0; i < length; ++i) {
+            command[i+2] = buffer[i];
+        }
+
+        write(fd, command, length + 2);
+
+        lock.unlock();
+    }
+
     int I2CBus::connect(int i2caddr) {
         if (ioctl(fd, I2C_SLAVE, i2caddr) < 0) {
             printf("Unable to open I2C device 0x%02X\n", i2caddr);
@@ -156,8 +174,9 @@ namespace dynastat {
         bus->get(address, 0x00, buffer, 2);
         assert((buffer[1] << 8 | buffer[0]) == 0xFE01);
 
+        // Workaround for 16bit address space
         buffer[0] = (uint8_t) mode;
-        bus->put(address, REG_MODE, buffer, 1);
+        bus->putRaw(address, REG_MODE, buffer, 1);
 
         worker = new boost::thread(boost::bind(&SensorBoard::update, this));
     }
