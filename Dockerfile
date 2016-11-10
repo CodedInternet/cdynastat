@@ -3,7 +3,15 @@ FROM resin/beaglebone-debian:latest
 ENV INITSYSTEM on
 
 RUN apt-get -y update
-RUN apt-get install -y cmake libssl-dev libx11-dev libboost-thread-dev libboost-system-dev libyaml-cpp-dev
+RUN apt-get install -y \
+    build-essential \
+    cmake \
+    libssl-dev \
+    libx11-dev \
+    libboost-thread-dev \
+    libboost-system-dev \
+    libyaml-cpp-dev \
+    libi2c-dev
 
 WORKDIR /app
 
