@@ -1,0 +1,5 @@
+docs/
+godynastat/
+lib/
+.gitmodules
+Vagrantfile
