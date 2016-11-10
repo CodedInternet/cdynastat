@@ -27,4 +27,4 @@ RUN cmake . -DARCH=arm
 RUN make cdynastat
 
 # Requires cape config to enable i2c-1
-CMD "echo cape-universaln > /sys/devices/platform/bone_capemgr/slots && /app/src/cdynastat"
+CMD "start.sh"
