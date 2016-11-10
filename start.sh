@@ -11,4 +11,4 @@ sleep 1
 hwclock -f /dev/rtc1 -s
 
 # Start application
-./src/cdynastat
+/app/src/cdynastat
