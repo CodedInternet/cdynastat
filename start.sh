@@ -6,7 +6,7 @@ if ! [ -a /dev/i2c-1 ]; then
 fi
 
 # Setup local clock in case we are offline
-echo "Started at " $(date)
+echo "Started at " $(date) | tee -a /data/start.log
 
 # Start application
 /app/src/cdynastat
