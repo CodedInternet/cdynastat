@@ -6,9 +6,7 @@ if ! [ -a /dev/i2c-1 ]; then
 fi
 
 # Setup local clock in case we are offline
-#echo ds3231 0x68 > /sys/bus/i2c/devices/i2c-1/new_device
-#sleep 1
-#hwclock -f /dev/rtc1 -s
+echo "Started at " $(date)
 
 # Start application
 /app/src/cdynastat
