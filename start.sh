@@ -7,7 +7,10 @@ if ! [ -a /dev/i2c-1 ]; then
 fi
 
 # Setup local clock in case we are offline
-echo ds3231 0x68 >/sys/bus/i2c/devices/i2c-2/new_device
+if ! [ -a /dev/rtc1 ]; then
+    # Create RTC device if not existing
+    echo ds3231 0x68 >/sys/bus/i2c/devices/i2c-2/new_device
+fi
 sleep 1
 hwclock -f /dev/rtc1 -s
 
