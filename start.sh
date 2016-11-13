@@ -3,7 +3,8 @@
 # Enable i2c-1
 if ! [ -a /dev/i2c-1 ]; then
     echo "Enabling i2c-1" | tee -a /data/start.log
-    echo cape-universaln > /sys/devices/platform/bone_capemgr/slots
+    echo 'BB-I2C1' > /sys/devices/platform/bone_capemgr/slots
+    echo 'BB-UART1' > /sys/devices/platform/bone_capemgr/slots
 fi
 
 # Setup local clock in case we are offline
