@@ -1,9 +1,9 @@
 # Build the main executable
-add_library(AbstractDynastat AbstractDynastat.cpp ByteTest.cpp)
+add_library(AbstractDynastat AbstractDynastat.cpp ByteTest.cpp SensorAddress.cpp)
 target_link_libraries(AbstractDynastat ${LIBWEBRTC})
 
 add_library(Dynastat Dynastat.cpp)
-target_link_libraries(Dynastat AbstractDynastat)
+target_link_libraries(Dynastat AbstractDynastat ${YAMLCPP_LIBRARY_RELEASE})
 
 add_library(DynastatSimulator DynastatSimulator.cpp)
 target_link_libraries(DynastatSimulator AbstractDynastat)
@@ -28,3 +28,6 @@ add_executable(ByteTest ByteTest.cpp)
 
 #add_executable(websocketpp_debug_client websocketpp_debug_client.cpp)
 #target_link_libraries(websocketpp_debug_client ${OPENSSL_LIBRARIES} ssl crypto )
+
+add_executable(SensorAddress SensorAddress.cpp)
+target_link_libraries(SensorAddress Dynastat)

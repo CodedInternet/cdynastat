@@ -199,6 +199,42 @@ namespace dynastat {
         }
     }
 
+    uint8_t SensorBoard::changeAddress(uint8_t newAddr) {
+        // stop background work so we have absolute control
+        running = false;
+        worker->join();
+
+        if (newAddr < 0x00 || newAddr > 0x7F) {
+            fprintf(stderr, "Invalid address 0x%x\n", newAddr);
+            return 0;
+        }
+
+        // Get the old address and santiy check
+        bus->getRaw(address, REG_ADDR, buffer, 1);
+        uint8_t old = buffer[0];
+        if(old != address) {
+            fprintf(stderr, "Stored address 0x%x does not match current device 0x%x\n", old, address);
+            return 0;
+        }
+
+        // perform write
+        buffer[0] = newAddr;
+        bus->putRaw(address, REG_ADDR, buffer, 1);
+
+        // Get new address and check it has been successful
+        bus->getRaw(address, REG_ADDR, buffer, 1);
+        uint8_t updated = buffer[0];
+        if(old == updated) {
+            std::cerr << "Update was not successful" << std::endl;
+            return old;
+        } else if (updated != newAddr) {
+            fprintf(stderr, "New value 0x%x does not match expected value 0x%x\n", updated, newAddr);
+            return updated;
+        }
+
+        return newAddr;
+    }
+
     DynastatSensor::DynastatSensor(SensorBoard *board, uint registry, bool mirror, unsigned short rows,
                                    unsigned short cols, unsigned short zero_value, unsigned short half_value,
                                    unsigned short full_value) {

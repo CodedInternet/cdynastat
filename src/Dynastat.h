@@ -73,6 +73,8 @@ namespace dynastat {
 
         uint16_t getValue(int reg);
 
+        uint8_t changeAddress(uint8_t newAddr);
+
     private:
         int address;
         I2CBus *bus;
@@ -81,6 +83,7 @@ namespace dynastat {
 
         static const uint16_t REG_MODE = 0x01;
         static const int REG_VALUES = 0x0100;
+        static const uint16_t REG_ADDR = 0x0004;
         static const int kRows = 16;
         static const int kCols = 24;
 
