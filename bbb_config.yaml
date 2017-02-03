@@ -6,22 +6,22 @@ i2c_bus:
   motor: 2
   sensor: 1
 motors:
-  right_first_ray:
-    address: 0x24
-    cal: 700
-    low: 450
-    high: 0
-    speed: 30
-    damping: 127
-    control: 1
-  right_forefoot_frontal:
-    address: 0x23
-    cal: 362
-    low: -163
-    high: 182
-    speed: 50
-    damping: 255
-    control: 2
+#  right_first_ray:
+#    address: 0x24
+#    cal: 700
+#    low: 450
+#    high: 0
+#    speed: 30
+#    damping: 127
+#    control: 1
+#  right_forefoot_frontal:
+#    address: 0x23
+#    cal: 362
+#    low: -163
+#    high: 182
+#    speed: 50
+#    damping: 255
+#    control: 2
 #  right_foot_size:
 #    address: 0x20
 #    cal: -20
@@ -30,17 +30,17 @@ motors:
 #    speed: 255
 #    damping: 127
 #    control: 7
-  right_rearfoot_frontal:
-    address: 0x21
-    cal: -260
-    low: -163
-    high: 160
-    speed: 200
-    damping: 255
-    control: 5
+#  right_rearfoot_frontal:
+#    address: 0x21
+#    cal: -260
+#    low: -163
+#    high: 160
+#    speed: 200
+#    damping: 255
+#    control: 5
 sensors:
   left_heel:
-    address: 0x21
+    address: 0x15
     mode: 2
     registry: 1
     mirror: y
@@ -50,7 +50,7 @@ sensors:
     half_value: 2047
     full_value: 4095
   left_mtp:
-    address: 0x16 #temp
+    address: 0x16
     mode: 1
     registry: 1
     mirror: y
