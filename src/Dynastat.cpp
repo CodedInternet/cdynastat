@@ -66,7 +66,7 @@ namespace dynastat {
         command[1] = (uint8_t) (reg & 0xff);
 
         for (int i = 0; i < length; ++i) {
-            command[i+2] = buffer[i];
+            command[i + 2] = buffer[i];
         }
 
         write(fd, command, length + 2);
@@ -166,13 +166,17 @@ namespace dynastat {
         return (~value & control);
     };
 
-    SensorBoard::SensorBoard(I2CBus *bus, int address, uint mode) {
+    SensorBoard::SensorBoard(I2CBus *bus, int address, uint mode) throw(UnrecognisedSensorException) {
         this->address = address;
         this->bus = bus;
 
         // Check the sensor ID is correct before we do anything
         bus->get(address, 0x00, buffer, 2);
-        assert((buffer[1] << 8 | buffer[0]) == 0xFE01);
+        if ((buffer[1] << 8 | buffer[0]) != 0xFE01) {
+            char *buf = new char[10];
+            sprintf(buf, "0x%x", (uint16_t) (buffer[1] << 8 | buffer[0]));
+            throw UnrecognisedSensorException(address, buf);
+        }
 
         // Workaround for 16bit address space
         buffer[0] = (uint8_t) mode;
@@ -212,7 +216,7 @@ namespace dynastat {
         // Get the old address and santiy check
         bus->getRaw(address, REG_ADDR, buffer, 1);
         uint8_t old = buffer[0];
-        if(old != address) {
+        if (old != address) {
             fprintf(stderr, "Stored address 0x%x does not match current device 0x%x\n", old, address);
             return 0;
         }
@@ -224,7 +228,7 @@ namespace dynastat {
         // Get new address and check it has been successful
         bus->getRaw(address, REG_ADDR, buffer, 1);
         uint8_t updated = buffer[0];
-        if(old == updated) {
+        if (old == updated) {
             std::cerr << "Update was not successful" << std::endl;
             return old;
         } else if (updated != newAddr) {
@@ -319,7 +323,12 @@ namespace dynastat {
                     try {
                         board = sensorBoards.at(conf[kConfAddress].as<int>());
                     } catch (std::out_of_range) {
-                        board = new SensorBoard(sensorBus, conf[kConfAddress].as<int>(), conf["mode"].as<uint>());
+                        try {
+                            board = new SensorBoard(sensorBus, conf[kConfAddress].as<int>(), conf["mode"].as<uint>());
+                        } catch (UnrecognisedSensorException sensorException) {
+                            std::cerr << sensorException.what() << std::endl;
+                            continue;
+                        }
                         sensorBoards[conf[kConfAddress].as<int>()] = board;
                     }
 
@@ -347,5 +356,11 @@ namespace dynastat {
             default:
                 break;
         }
+    }
+
+    const char *UnrecognisedSensorException::what() const throw() {
+        char *buf = new char[50];
+        sprintf(buf, "Unrecognised sensor at 0x%x. Response was %s", addr, resp);
+        return buf;
     }
 }

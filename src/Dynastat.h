@@ -65,9 +65,19 @@ namespace dynastat {
         bool readControl();
     };
 
+    class UnrecognisedSensorException : public std::exception {
+    public:
+        UnrecognisedSensorException(const int addr, const char* resp) : addr(addr), resp(resp) {};
+        virtual const char* what() const throw();
+
+    private:
+        const int addr;
+        const char* resp;
+    };
+
     class SensorBoard {
     public:
-        SensorBoard(I2CBus *bus, int address, uint mode);
+        SensorBoard(I2CBus *bus, int address, uint mode) throw(UnrecognisedSensorException);
 
         ~SensorBoard();
 
