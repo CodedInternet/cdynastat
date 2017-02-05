@@ -13,7 +13,8 @@ RUN apt-get install -y \
     libboost-thread-dev \
     libboost-system-dev \
     libyaml-cpp-dev \
-    libi2c-dev
+    libi2c-dev \
+    minicom
 
 # Setup and copy app
 WORKDIR /app
