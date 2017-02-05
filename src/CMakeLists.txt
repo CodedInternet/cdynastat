@@ -1,5 +1,5 @@
 # Build the main executable
-add_library(AbstractDynastat AbstractDynastat.cpp ByteTest.cpp SensorAddress.cpp)
+add_library(AbstractDynastat AbstractDynastat.cpp)
 target_link_libraries(AbstractDynastat ${LIBWEBRTC})
 
 add_library(Dynastat Dynastat.cpp)
