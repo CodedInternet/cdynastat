@@ -145,7 +145,7 @@ namespace dynastat {
 
     public:
         I2CBus *sensorBus;
-        I2CBus *motorBus;
+        UARTMCU *motorBus;
 
         Dynastat(YAML::Node config);
 

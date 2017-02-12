@@ -3,8 +3,9 @@ version: 1
 signaling_servers:
 - ws://10.20.30.20:8000/ws/device/test/
 i2c_bus:
-  motor: 2
   sensor: 1
+uart:
+  motor: "/dev/ttyS2"
 motors:
 #  right_first_ray:
 #    address: 0x24

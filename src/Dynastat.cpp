@@ -303,9 +303,9 @@ namespace dynastat {
             case 1: {
                 // Open i2c busses
                 const uint8_t sBus = (const uint8_t) config["i2c_bus"]["sensor"].as<int>();
-                const uint8_t mBus = (const uint8_t) config["i2c_bus"]["motor"].as<int>();
+                char* mBus = config["uart"]["motor"].as<char*>();
                 sensorBus = new I2CBus(sBus);
-                motorBus = new I2CBus(mBus);
+                motorBus = new UARTMCU(mBus);
 
                 YAML::Node motorConfig = config["motors"];
                 for (YAML::const_iterator it = motorConfig.begin(); it != motorConfig.end(); ++it) {
