@@ -111,7 +111,7 @@ namespace dynastat {
 
     int32_t UARTMCU::get(int i2caddr, uint8_t command) {
         int value;
-        char* buf = char[sizeof(value)];
+        char* buf = new char[sizeof(int)];
         lock.lock();
         dprintf(fd, "M%d %d", i2caddr, command);
         read(fd, buf, sizeof(value));
