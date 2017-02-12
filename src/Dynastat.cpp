@@ -46,7 +46,6 @@ namespace dynastat {
         lock.unlock();
     }
 
-
     void I2CBus::put(int i2caddr, uint16_t command, uint8_t *buffer, size_t length) {
         lock.lock();
         connect(i2caddr);
@@ -79,6 +78,46 @@ namespace dynastat {
             printf("Unable to open I2C device 0x%02X\n", i2caddr);
             throw;
         }
+    }
+
+    UARTMCU::UARTMCU(char *ttyName) {
+        fd = open(ttyName, O_RDWR);
+        if(fd < 0) {
+            fprintf(stderr, "Unable to open UART file %s", ttyName);
+            exit(-2);
+        }
+
+        // get old tty settings and zero new struct
+        tcgetattr(fd, &oldtio);
+        //bzero(&newtio, sizeof(newtio));
+
+        // set board rate and serial settings
+        newtio.c_cflag = B115200 | CS8;
+
+        // write new settings
+        tcflush(fd, TCIFLUSH);
+        tcsetattr(fd, TCSANOW, &newtio);
+    }
+
+    UARTMCU::~UARTMCU() {
+        tcsetattr(fd, TCSANOW, &oldtio);
+        close(fd);
+    }
+
+    void UARTMCU::put(int i2caddr, uint8_t command, int32_t value) {
+        lock.lock();
+        dprintf(fd, "M%d %d %d", i2caddr, command, value);
+        lock.unlock();
+    }
+
+    int32_t UARTMCU::get(int i2caddr, uint8_t command) {
+        int value;
+        char* buf = char[sizeof(value)];
+        lock.lock();
+        dprintf(fd, "M%d %d", i2caddr, command);
+        read(fd, buf, sizeof(value));
+        sscanf(buf, "%x", &value);
+        return (int32_t) value;
     }
 
     RMCS220xMotor::RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,

@@ -5,6 +5,7 @@
 #ifndef CDYNASTAT_DYNASTAT_H
 #define CDYNASTAT_DYNASTAT_H
 
+#include <termios.h>
 #include <json/reader.h>
 #include <yaml-cpp/yaml.h>
 
@@ -30,6 +31,22 @@ namespace dynastat {
 
         int fd;
 
+        boost::mutex lock;
+    };
+
+    class UARTMCU {
+    public:
+        UARTMCU(char* ttyName);
+
+        ~UARTMCU();
+
+        void put(int i2caddr, uint8_t command, int32_t value);
+
+        int32_t get(int i2caddr, uint8_t command);
+
+    private:
+        struct termios oldtio, newtio;
+        int fd;
         boost::mutex lock;
     };
 
