@@ -6,7 +6,6 @@
 
 #include <linux/i2c-dev.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
 
 
@@ -120,7 +119,7 @@ namespace dynastat {
         return (int32_t) value;
     }
 
-    RMCS220xMotor::RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
+    RMCS220xMotor::RMCS220xMotor(UARTMCU *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
                                  int control, I2CBus *controlBus) {
         this->bus = bus;
         this->address = address;
@@ -130,13 +129,8 @@ namespace dynastat {
 
         printf("Motor %x: S%d \t D%d\n", address, speed, damping);
 
-        uint8_t b[2];
-        b[0] = (uint8_t) (speed & 0xff);
-        b[1] = (uint8_t) (speed >> 8);
-        bus->put(address, REG_MAX_SPEED, b, 2);
-        b[0] = (uint8_t) (damping & 0xff);
-        b[1] = (uint8_t) (damping >> 8);
-        bus->put(address, REG_DAMPING, b, 2);
+        bus->put(address, REG_MAX_SPEED, speed);
+        bus->put(address, REG_DAMPING, damping);
 
         this->control = this->control << (control - 1);
 
@@ -156,21 +150,12 @@ namespace dynastat {
     }
 
     int RMCS220xMotor::readPosition() {
-        uint8_t b[4];
         int pos;
-        bus->get(address, REG_CALIBRATE, b, 4);
-        pos = (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | (b[0]);
-        return pos;
+        return bus->get(address, REG_CALIBRATE);
     }
 
     void RMCS220xMotor::move(int pos) {
-        uint8_t b[4];
-        b[0] = (uint8_t) (pos & 0xff);
-        b[1] = (uint8_t) ((pos >> 8) & 0xff);
-        b[2] = (uint8_t) ((pos >> 16) & 0xff);
-        b[3] = (uint8_t) (pos >> 24);
-        bus->put(address, REG_GOTO, b, 4);
-        return;
+        return bus->put(address, REG_GOTO, pos);
     }
 
     void RMCS220xMotor::home(int cal) {
@@ -185,12 +170,7 @@ namespace dynastat {
             move(pos);
         }
 
-        uint8_t b[4];
-        b[0] = (uint8_t) (cal & 0xff);
-        b[1] = (uint8_t) ((cal >> 8) & 0xff);
-        b[2] = (uint8_t) ((cal >> 16) & 0xff);
-        b[3] = (uint8_t) (cal >> 24);
-        bus->put(address, REG_CALIBRATE, b, 4);
+        bus->put(address, REG_CALIBRATE, cal);
 
         move(0);
         return;

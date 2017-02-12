@@ -55,19 +55,19 @@ namespace dynastat {
     public:
         virtual int getCurrentPosition() override;
 
-        RMCS220xMotor(I2CBus *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
-                              int control, I2CBus *controlBus);
+        RMCS220xMotor(UARTMCU *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
+                      int control, I2CBus *controlBus);
 
         virtual void setPosition(int pos);
 
     private:
-        uint16_t REG_MAX_SPEED = 0;
-        uint16_t REG_MANUAL = 1;
-        uint16_t REG_DAMPING = 2;
-        uint16_t REG_CALIBRATE = 3;
-        uint16_t REG_GOTO = 4;
+        uint8_t REG_MAX_SPEED = 0;
+        uint8_t REG_MANUAL = 1;
+        uint8_t REG_DAMPING = 2;
+        uint8_t REG_CALIBRATE = 3;
+        uint8_t REG_GOTO = 4;
 
-        I2CBus *bus;
+        UARTMCU *bus;
         I2CBus *controlBus;
         int address;
         uint16_t control = 1;
