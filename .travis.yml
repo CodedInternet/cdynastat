@@ -7,6 +7,7 @@ addons:
     - boost-latest
     packages:
     - libboost1.55-all-dev
+    - libyaml-cpp-dev
     - g++-4.9
 #    - g++-4.9-arm-linux-gnueabi
     - g++-4.9-multilib
