@@ -36,7 +36,7 @@ namespace dynastat {
 
     class UARTMCU {
     public:
-        UARTMCU(char* ttyName);
+        UARTMCU(const char *ttyName);
 
         ~UARTMCU();
 

@@ -79,7 +79,7 @@ namespace dynastat {
         }
     }
 
-    UARTMCU::UARTMCU(char *ttyName) {
+    UARTMCU::UARTMCU(const char *ttyName) {
         fd = open(ttyName, O_RDWR);
         if(fd < 0) {
             fprintf(stderr, "Unable to open UART file %s", ttyName);
@@ -303,9 +303,9 @@ namespace dynastat {
             case 1: {
                 // Open i2c busses
                 const uint8_t sBus = (const uint8_t) config["i2c_bus"]["sensor"].as<int>();
-                char* mBus = config["uart"]["motor"].as<char*>();
+                std::string mBus = config["uart"]["motor"].as<std::string>();
                 sensorBus = new I2CBus(sBus);
-                motorBus = new UARTMCU(mBus);
+                motorBus = new UARTMCU(mBus.c_str());
 
                 YAML::Node motorConfig = config["motors"];
                 for (YAML::const_iterator it = motorConfig.begin(); it != motorConfig.end(); ++it) {
