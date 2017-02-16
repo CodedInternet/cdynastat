@@ -45,6 +45,8 @@ namespace dynastat {
         int32_t get(int i2caddr, uint8_t command);
 
     private:
+        int send(char *bufPtr, int length);
+
         static const short BUFFER_LENGTH = 32;
         struct termios oldtio, newtio;
         int fd;

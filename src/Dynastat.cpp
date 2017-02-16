@@ -106,24 +106,30 @@ namespace dynastat {
     void UARTMCU::put(int i2caddr, uint8_t command, int32_t value) {
         lock.lock();
         int length = sprintf(buf, "M%d %d %d", i2caddr, command, value);
-        char* ptr = buf;
-        for(int i = 0; i < length; i++) {
-            write(fd, ptr++, 1);
-            usleep(10000);
-        }
+        send(buf, length);
         lock.unlock();
     }
 
     int32_t UARTMCU::get(int i2caddr, uint8_t command) {
         int value;
         lock.lock();
-        dprintf(fd, "M%d %d", i2caddr, command);
+        int length = sprintf(buf, "M%d %d", i2caddr, command);
+        send(buf, length);
         ssize_t bytes = read(fd, buf, sizeof(value));
         if (bytes > 0) {
             buf[bytes] = '\0'; // Null terminator
         }
         sscanf(buf, "%d", &value);
         return (int32_t) value;
+    }
+
+    int UARTMCU::send(char *bufPtr, int length) {
+        int i;
+        for(i = 0; i < length; i++) {
+            write(fd, bufPtr++, 1);
+            usleep(10000);
+        }
+        return i;
     }
 
     RMCS220xMotor::RMCS220xMotor(UARTMCU *bus, int address, int rawLow, int rawHigh, int cal, int speed, int damping,
