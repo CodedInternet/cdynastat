@@ -105,13 +105,17 @@ namespace dynastat {
 
     void UARTMCU::put(int i2caddr, uint8_t command, int32_t value) {
         lock.lock();
-        dprintf(fd, "M%d %d %d", i2caddr, command, value);
+        int length = sprintf(buf, "M%d %d %d", i2caddr, command, value);
+        char* ptr = buf;
+        for(int i = 0; i < length; i++) {
+            write(fd, ptr++, 1);
+            usleep(10000);
+        }
         lock.unlock();
     }
 
     int32_t UARTMCU::get(int i2caddr, uint8_t command) {
         int value;
-        char* buf = new char[sizeof(int)];
         lock.lock();
         dprintf(fd, "M%d %d", i2caddr, command);
         ssize_t bytes = read(fd, buf, sizeof(value));

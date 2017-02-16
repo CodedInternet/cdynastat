@@ -45,8 +45,10 @@ namespace dynastat {
         int32_t get(int i2caddr, uint8_t command);
 
     private:
+        static const short BUFFER_LENGTH = 32;
         struct termios oldtio, newtio;
         int fd;
+        char* buf = new char[BUFFER_LENGTH];
         boost::mutex lock;
     };
 
