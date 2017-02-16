@@ -114,8 +114,11 @@ namespace dynastat {
         char* buf = new char[sizeof(int)];
         lock.lock();
         dprintf(fd, "M%d %d", i2caddr, command);
-        read(fd, buf, sizeof(value));
-        sscanf(buf, "%x", &value);
+        ssize_t bytes = read(fd, buf, sizeof(value));
+        if (bytes > 0) {
+            buf[bytes] = '\0'; // Null terminator
+        }
+        sscanf(buf, "%d", &value);
         return (int32_t) value;
     }
 
